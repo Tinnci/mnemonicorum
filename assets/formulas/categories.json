@@ -1,0 +1,144 @@
+[
+    {
+      "id": "calculus",
+      "name": "微积分",
+      "description": "微积分公式",
+      "formulaSets": [
+        {
+          "id": "taylor_series",
+          "name": "泰勒级数",
+          "difficulty": "medium",
+          "formulas": [
+            {
+              "id": "e_to_x_taylor",
+              "name": "e的x次幂的泰勒级数",
+              "latexExpression": "e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}",
+              "category": "calculus",
+              "subcategory": "series",
+              "difficulty": "medium",
+              "tags": ["taylor", "series", "e"],
+              "description": "e的x次幂的泰勒级数展开。",
+              "components": [
+                {
+                  "id": "e_x_lhs",
+                  "latexPart": "e^x",
+                  "type": "leftSide",
+                  "description": "e的x次幂"
+                },
+                {
+                  "id": "e_x_rhs",
+                  "latexPart": "\sum_{n=0}^{\infty} \frac{x^n}{n!}",
+                  "type": "rightSide",
+                  "description": "求和从n=0到无穷大，x的n次幂除以n的阶乘"
+                }
+              ],
+              "semanticDescription": "e的x次幂等于从n等于0到无穷大的x的n次幂除以n的阶乘的和。"
+            }
+          ]
+        },
+        {
+          "id": "integration_rules",
+          "name": "积分法则",
+          "difficulty": "medium",
+          "formulas": [
+            {
+              "id": "integration_by_parts",
+              "name": "分部积分法",
+              "latexExpression": "\int u \, dv = uv - \int v \, du",
+              "category": "calculus",
+              "subcategory": "integration",
+              "difficulty": "medium",
+              "tags": ["integration", "parts"],
+              "description": "微积分中的分部积分公式。",
+              "components": [
+                {
+                  "id": "ibp_lhs",
+                  "latexPart": "\int u \, dv",
+                  "type": "leftSide",
+                  "description": "u对dv的积分"
+                },
+                {
+                  "id": "ibp_rhs",
+                  "latexPart": "uv - \int v \, du",
+                  "type": "rightSide",
+                  "description": "uv减去v对du的积分"
+                }
+              ],
+              "semanticDescription": "u乘dv的积分等于uv减去v乘du的积分。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trigonometry",
+      "name": "三角学",
+      "description": "三角函数公式",
+      "formulaSets": [
+        {
+          "id": "identities",
+          "name": "三角恒等式",
+          "difficulty": "easy",
+          "formulas": [
+            {
+              "id": "pythagorean_identity",
+              "name": "勾股定理恒等式",
+              "latexExpression": "\sin^2 x + \cos^2 x = 1",
+              "category": "trigonometry",
+              "subcategory": "identities",
+              "difficulty": "easy",
+              "tags": ["trigonometry", "identity", "sine", "cosine"],
+              "description": "基本的三角函数勾股定理恒等式。",
+              "components": [
+                {
+                  "id": "pi_lhs",
+                  "latexPart": "\sin^2 x + \cos^2 x",
+                  "type": "leftSide",
+                  "description": "sin平方x加cos平方x"
+                },
+                {
+                  "id": "pi_rhs",
+                  "latexPart": "1",
+                  "type": "rightSide",
+                  "description": "1"
+                }
+              ],
+              "semanticDescription": "sin平方x加cos平方x等于1。"
+            }
+          ]
+        },
+        {
+          "id": "addition_formulas",
+          "name": "加法公式",
+          "difficulty": "medium",
+          "formulas": [
+            {
+              "id": "sin_a_plus_b",
+              "name": "sin(a+b)",
+              "latexExpression": "\sin(a + b) = \sin a \cos b + \cos a \sin b",
+              "category": "trigonometry",
+              "subcategory": "addition",
+              "difficulty": "medium",
+              "tags": ["trigonometry", "addition", "sine"],
+              "description": "sin函数的加法公式。",
+              "components": [
+                {
+                  "id": "sab_lhs",
+                  "latexPart": "\sin(a + b)",
+                  "type": "leftSide",
+                  "description": "sin(a加b)"
+                },
+                {
+                  "id": "sab_rhs",
+                  "latexPart": "\sin a \cos b + \cos a \sin b",
+                  "type": "rightSide",
+                  "description": "sin a cos b加cos a sin b"
+                }
+              ],
+              "semanticDescription": "sin(a加b)等于sin a cos b加cos a sin b。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
