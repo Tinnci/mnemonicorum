@@ -136,59 +136,68 @@ class _FormulaListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
-            children: [
-              SizedBox(
-                width: 120,
-                child: FormulaRenderer(
-                  latexExpression: formula.latexExpression,
-                  fontSize: 16,
-                  semanticDescription: formula.description,
-                  useCache: true,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      formula.name,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 120,
+                  height: 60, // 固定高度
+                  child: FittedBox(
+                    // 关键：向内 scaleDown
+                    fit: BoxFit.scaleDown,
+                    child: FormulaRenderer(
+                      latexExpression: formula.latexExpression,
+                      fontSize: 28, // 不要再传过大的 fontSize
+                      semanticDescription: formula.description,
+                      useCache: true,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      formula.description,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              // Category indicator
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withAlpha(26),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  formula.category,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        formula.name,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        formula.description,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                // Category indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withAlpha(26),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    formula.category,
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -275,48 +284,62 @@ class _FormulaGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Formula preview
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: FormulaRenderer(
-                    latexExpression: formula.latexExpression,
-                    fontSize: 16,
-                    semanticDescription: formula.description,
-                    useCache: true,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Formula name
-              Expanded(
-                flex: 1,
-                child: Text(
-                  formula.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fontSize = (constraints.maxWidth / 8).clamp(12.0, 28.0); // 随宽度变化
+        return Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ),
-      ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Formula preview
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: SizedBox(
+                        width: constraints.maxWidth * 0.8,
+                        height: constraints.maxHeight * 0.6,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: FormulaRenderer(
+                            latexExpression: formula.latexExpression,
+                            fontSize: fontSize,
+                            semanticDescription: formula.description,
+                            useCache: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Formula name
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      formula.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
