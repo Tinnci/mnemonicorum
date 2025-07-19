@@ -145,18 +145,20 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
     return KeyboardListener(
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
-      child: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Question: Display the left side with appropriate relation symbol
-              // 移除了Flexible组件，直接使用Padding来提供边距
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // 题目区域 - 使用Card包装，增加视觉焦点
+            Card(
+              elevation: 2,
+              margin: const EdgeInsets.symmetric(vertical: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -167,31 +169,38 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
                         latexExpression: questionFormulaComponent.latexPart,
                         semanticDescription:
                             questionFormulaComponent.description,
-                        fontSize: 30,
+                        fontSize: 32, // 增大主公式字号
                       ),
                       const SizedBox(width: 16),
-                      // Add appropriate relation symbol
+                      // 关系符号
                       FormulaRenderer(
                         latexExpression: _getRelationSymbol(),
                         semanticDescription: "等于",
-                        fontSize: 30,
+                        fontSize: 32,
                       ),
                       const SizedBox(width: 16),
                       const Text(
                         '?',
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold,
+                          color: Colors.orange, // 使用醒目的颜色
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
-              // Options
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            ),
+
+            // 视觉分隔
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 24),
+
+            // 选项区域 - 使用Expanded填充剩余空间
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   children: widget.exercise.options.asMap().entries.map((
                     entry,
@@ -208,69 +217,106 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
                     final bool isIncorrect =
                         widget.showFeedback && isSelected && !isCorrect;
 
+                    // 使用主题颜色
                     Color? borderColor;
+                    Color? backgroundColor;
+
                     if (isCorrect) {
                       borderColor = Colors.green;
+                      backgroundColor = Colors.green.withAlpha(26);
                     } else if (isIncorrect) {
-                      borderColor = Colors.red;
+                      borderColor = Theme.of(context).colorScheme.error;
+                      backgroundColor = Theme.of(
+                        context,
+                      ).colorScheme.error.withAlpha(26);
                     } else if (isSelected) {
-                      borderColor = Colors.blue;
+                      borderColor = Theme.of(context).colorScheme.primary;
+                      backgroundColor = Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha(26);
                     } else if (isFocused) {
                       borderColor = Colors.orange;
+                      backgroundColor = Colors.orange.withAlpha(26);
                     }
 
-                    return GestureDetector(
-                      onTap: widget.showFeedback
-                          ? null
-                          : () => widget.onOptionSelected(option.id),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: borderColor ?? Colors.grey,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          color: isSelected && !widget.showFeedback
-                              ? Colors.blue.withAlpha(26)
-                              : isCorrect
-                              ? Colors.green.withAlpha(26)
-                              : isIncorrect
-                              ? Colors.red.withAlpha(26)
-                              : isFocused
-                              ? Colors.orange.withAlpha(26)
-                              : null,
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: borderColor ?? Colors.grey.shade300,
+                          width: 2,
                         ),
-                        child: Row(
-                          children: [
-                            if (!widget.showFeedback)
-                              Text(
-                                '${index + 1}. ',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: isFocused
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: Colors.grey[600],
+                        borderRadius: BorderRadius.circular(12),
+                        color: backgroundColor,
+                        boxShadow: isSelected || isFocused
+                            ? [
+                                BoxShadow(
+                                  color: (borderColor ?? Colors.grey)
+                                      .withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
-                              ),
-                            Expanded(
-                              child: FormulaRenderer(
-                                latexExpression: option.latexExpression,
-                                semanticDescription: option.textLabel,
-                                fontSize: 24,
-                              ),
+                              ]
+                            : null,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: widget.showFeedback
+                              ? null
+                              : () => widget.onOptionSelected(option.id),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                if (!widget.showFeedback)
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: isFocused
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '${index + 1}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: isFocused
+                                              ? FontWeight.bold
+                                              : FontWeight.w500,
+                                          color: isFocused
+                                              ? Colors.white
+                                              : Colors.grey[600],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                if (!widget.showFeedback)
+                                  const SizedBox(width: 16),
+                                Expanded(
+                                  child: FormulaRenderer(
+                                    latexExpression: option.latexExpression,
+                                    semanticDescription: option.textLabel,
+                                    fontSize: 24, // 选项公式字号
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     );
                   }).toList(),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

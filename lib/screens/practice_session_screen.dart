@@ -131,7 +131,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                     if (context.canPop()) {
                       context.pop();
                     } else {
-                      context.go('/');
+                      context.go('/home'); // 修改：从'/'改为'/home'
                     }
                   },
                 ),
@@ -169,7 +169,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                           if (context.canPop()) {
                             context.pop();
                           } else {
-                            context.go('/');
+                            context.go('/home'); // 修改：从'/'改为'/home'
                           }
                         },
                         child: const Text('返回主页'),
@@ -262,7 +262,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                             context.pop(); // Go back to previous screen
                           } else {
                             context.go(
-                              '/',
+                              '/home', // 修改：从'/'改为'/home'
                             ); // Go to home screen if nothing to pop
                           }
                         },
