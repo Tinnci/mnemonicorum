@@ -70,7 +70,7 @@ Future<void> _initializeApp() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider<ProgressService>(create: (_) => progressService),
+        ChangeNotifierProvider<ProgressService>(create: (_) => progressService),
         Provider<FormulaRepository>(create: (_) => formulaRepository),
         ChangeNotifierProvider<AchievementSystem>(
           create: (_) => achievementSystem,

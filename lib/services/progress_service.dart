@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:mnemonicorum/models/progress.dart';
 
-class ProgressService {
+class ProgressService extends ChangeNotifier {
   late Box<FormulaProgress> _progressBox;
 
   Future<void> init() async {
@@ -42,6 +43,7 @@ class ProgressService {
     }
 
     await _progressBox.put(formulaId, progress);
+    notifyListeners(); // Notify UI to update
   }
 
   List<FormulaProgress> getAllFormulaProgress() {
@@ -178,5 +180,6 @@ class ProgressService {
 
   Future<void> clearAllProgress() async {
     await _progressBox.clear();
+    notifyListeners(); // Notify UI to update after clearing progress
   }
 }
