@@ -25,8 +25,8 @@ class CompletionExerciseWidget extends StatefulWidget {
 }
 
 class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
-  // Track which blank is currently selected
-  String? _selectedBlankId;
+  // 删除 _selectedBlankId 状态变量，改为单步操作
+  // String? _selectedBlankId;
 
   // Map to track which option is placed in which blank
   final Map<String, String> _filledBlanks = {};
@@ -94,17 +94,18 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
             _selectOptionByIndex(3);
           }
           break;
-        case LogicalKeyboardKey.tab:
-          // Tab to select the blank (if not already selected)
-          if (_selectedBlankId == null) {
-            final blankComponent = _findBlankComponent();
-            if (blankComponent != null) {
-              setState(() {
-                _selectedBlankId = blankComponent.id;
-              });
-            }
-          }
-          break;
+        // 删除 Tab 键逻辑，改为单步操作
+        // case LogicalKeyboardKey.tab:
+        //   // Tab to select the blank (if not already selected)
+        //   if (_selectedBlankId == null) {
+        //     final blankComponent = _findBlankComponent();
+        //     if (blankComponent != null) {
+        //       setState(() {
+        //         _selectedBlankId = blankComponent.id;
+        //       });
+        //     }
+        //   }
+        //   break;
       }
     }
   }
@@ -116,18 +117,11 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
         widget.selectedOptionId == option.id;
 
     if (!isUsed) {
-      // Auto-select blank if none selected
-      if (_selectedBlankId == null) {
-        final blankComponent = _findBlankComponent();
-        if (blankComponent != null) {
-          _selectedBlankId = blankComponent.id;
-        }
-      }
-
-      if (_selectedBlankId != null) {
+      // 单步操作：直接找到空白组件并填充
+      final blankComponent = _findBlankComponent();
+      if (blankComponent != null) {
         setState(() {
-          _filledBlanks[_selectedBlankId!] = option.id;
-          _selectedBlankId = null;
+          _filledBlanks[blankComponent.id] = option.id;
         });
         widget.onOptionSelected(option.id);
       }
@@ -302,42 +296,26 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
         ),
       );
     } else {
-      // Display an improved blank space with "挖空"式设计
-      return GestureDetector(
-        onTap: () {
-          if (!widget.showFeedback) {
-            setState(() {
-              _selectedBlankId = blankComponent.id;
-            });
-          }
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: _selectedBlankId == blankComponent.id
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey.shade400,
-              width: 2,
-              style: BorderStyle.solid,
-            ),
-            borderRadius: BorderRadius.circular(10),
-            color: _selectedBlankId == blankComponent.id
-                ? Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer.withValues(alpha: (0.3))
-                : Colors.grey.shade50,
+      // 显示一个更清晰的虚线框作为空白提示，不再可点击
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.blue.withValues(alpha: 0.5), // 使用主题色相关的虚线
+            width: 2,
+            style: BorderStyle.solid,
           ),
-          child: Text(
-            '?',
-            style: TextStyle(
-              fontSize: 24,
-              color: _selectedBlankId == blankComponent.id
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.blue.withValues(alpha: 0.05), // 淡淡的背景色
+        ),
+        child: const Text(
+          '?',
+          style: TextStyle(
+            fontSize: 24,
+            fontFamily: 'monospace', // 使用等宽字体
+            color: Colors.blue,
+            fontWeight: FontWeight.w500,
           ),
         ),
       );
@@ -392,17 +370,16 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
             ),
             child: InkWell(
               onTap: () {
-                if (!widget.showFeedback &&
-                    _selectedBlankId != null &&
-                    !isUsed) {
-                  // Fill the selected blank with this option
-                  setState(() {
-                    _filledBlanks[_selectedBlankId!] = option.id;
-                    _selectedBlankId = null;
-                  });
-
-                  // Notify parent about the selection
-                  widget.onOptionSelected(option.id);
+                if (!widget.showFeedback && !isUsed) {
+                  // 单步操作：直接找到空白组件并填充
+                  final blankComponent = _findBlankComponent();
+                  if (blankComponent != null) {
+                    setState(() {
+                      _filledBlanks[blankComponent.id] = option.id;
+                    });
+                    // 通知父组件选择完成
+                    widget.onOptionSelected(option.id);
+                  }
                 }
               },
               borderRadius: BorderRadius.circular(10),
