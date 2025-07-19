@@ -197,12 +197,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **LaTeX Community**: For mathematical notation standards
 - **Open Source Contributors**: For various packages and tools used
 
-## 📞 Support
-
-For questions, issues, or contributions:
-- **Issues**: [GitHub Issues](https://github.com/yourusername/mnemonicorum/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/mnemonicorum/discussions)
-- **Email**: your.email@example.com
 
 ---
 
