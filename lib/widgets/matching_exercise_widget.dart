@@ -154,119 +154,120 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Question: Display the left side with appropriate relation symbol
-              Flexible(
+              // 移除了Flexible组件，直接使用Padding来提供边距
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width - 32,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: FormulaRenderer(
-                            latexExpression: questionFormulaComponent.latexPart,
-                            semanticDescription:
-                                questionFormulaComponent.description,
-                            fontSize: 30,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Add appropriate relation symbol
-                        FormulaRenderer(
-                          latexExpression: _getRelationSymbol(),
-                          semanticDescription: "等于",
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FormulaRenderer(
+                        latexExpression: questionFormulaComponent.latexPart,
+                        semanticDescription:
+                            questionFormulaComponent.description,
+                        fontSize: 30,
+                      ),
+                      const SizedBox(width: 16),
+                      // Add appropriate relation symbol
+                      FormulaRenderer(
+                        latexExpression: _getRelationSymbol(),
+                        semanticDescription: "等于",
+                        fontSize: 30,
+                      ),
+                      const SizedBox(width: 16),
+                      const Text(
+                        '?',
+                        style: TextStyle(
                           fontSize: 30,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(width: 16),
-                        const Text(
-                          '?',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 40),
               // Options
-              Column(
-                children: widget.exercise.options.asMap().entries.map((entry) {
-                  final int index = entry.key;
-                  final option = entry.value;
-                  final bool isSelected = widget.selectedOptionId == option.id;
-                  final bool isFocused =
-                      _focusedOptionIndex == index && !widget.showFeedback;
-                  final bool isCorrect =
-                      widget.showFeedback &&
-                      option.id == widget.correctAnswerId;
-                  final bool isIncorrect =
-                      widget.showFeedback && isSelected && !isCorrect;
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: widget.exercise.options.asMap().entries.map((
+                    entry,
+                  ) {
+                    final int index = entry.key;
+                    final option = entry.value;
+                    final bool isSelected =
+                        widget.selectedOptionId == option.id;
+                    final bool isFocused =
+                        _focusedOptionIndex == index && !widget.showFeedback;
+                    final bool isCorrect =
+                        widget.showFeedback &&
+                        option.id == widget.correctAnswerId;
+                    final bool isIncorrect =
+                        widget.showFeedback && isSelected && !isCorrect;
 
-                  Color? borderColor;
-                  if (isCorrect) {
-                    borderColor = Colors.green;
-                  } else if (isIncorrect) {
-                    borderColor = Colors.red;
-                  } else if (isSelected) {
-                    borderColor = Colors.blue;
-                  } else if (isFocused) {
-                    borderColor = Colors.orange;
-                  }
+                    Color? borderColor;
+                    if (isCorrect) {
+                      borderColor = Colors.green;
+                    } else if (isIncorrect) {
+                      borderColor = Colors.red;
+                    } else if (isSelected) {
+                      borderColor = Colors.blue;
+                    } else if (isFocused) {
+                      borderColor = Colors.orange;
+                    }
 
-                  return GestureDetector(
-                    onTap: widget.showFeedback
-                        ? null
-                        : () => widget.onOptionSelected(option.id),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: borderColor ?? Colors.grey,
-                          width: 2,
+                    return GestureDetector(
+                      onTap: widget.showFeedback
+                          ? null
+                          : () => widget.onOptionSelected(option.id),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: borderColor ?? Colors.grey,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          color: isSelected && !widget.showFeedback
+                              ? Colors.blue.withAlpha(26)
+                              : isCorrect
+                              ? Colors.green.withAlpha(26)
+                              : isIncorrect
+                              ? Colors.red.withAlpha(26)
+                              : isFocused
+                              ? Colors.orange.withAlpha(26)
+                              : null,
                         ),
-                        borderRadius: BorderRadius.circular(10),
-                        color: isSelected && !widget.showFeedback
-                            ? Colors.blue.withAlpha(26)
-                            : isCorrect
-                            ? Colors.green.withAlpha(26)
-                            : isIncorrect
-                            ? Colors.red.withAlpha(26)
-                            : isFocused
-                            ? Colors.orange.withAlpha(26)
-                            : null,
-                      ),
-                      child: Row(
-                        children: [
-                          if (!widget.showFeedback)
-                            Text(
-                              '${index + 1}. ',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: isFocused
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: Colors.grey[600],
+                        child: Row(
+                          children: [
+                            if (!widget.showFeedback)
+                              Text(
+                                '${index + 1}. ',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: isFocused
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            Expanded(
+                              child: FormulaRenderer(
+                                latexExpression: option.latexExpression,
+                                semanticDescription: option.textLabel,
+                                fontSize: 24,
                               ),
                             ),
-                          Expanded(
-                            child: FormulaRenderer(
-                              latexExpression: option.latexExpression,
-                              semanticDescription: option.textLabel,
-                              fontSize: 24,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
