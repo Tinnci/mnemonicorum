@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mnemonicorum/models/exercise.dart';
 import 'package:mnemonicorum/widgets/formula_renderer.dart';
 
@@ -24,34 +25,103 @@ class RecognitionExerciseWidget extends StatefulWidget {
 }
 
 class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
+  int _focusedOptionIndex = 0;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-focus when widget is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent && !widget.showFeedback) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowUp:
+          setState(() {
+            _focusedOptionIndex =
+                (_focusedOptionIndex - 1) % widget.exercise.options.length;
+            if (_focusedOptionIndex < 0) {
+              _focusedOptionIndex = widget.exercise.options.length - 1;
+            }
+          });
+          break;
+        case LogicalKeyboardKey.arrowDown:
+          setState(() {
+            _focusedOptionIndex =
+                (_focusedOptionIndex + 1) % widget.exercise.options.length;
+          });
+          break;
+        case LogicalKeyboardKey.enter:
+        case LogicalKeyboardKey.space:
+          final selectedOption = widget.exercise.options[_focusedOptionIndex];
+          widget.onOptionSelected(selectedOption.id);
+          break;
+        case LogicalKeyboardKey.digit1:
+          if (widget.exercise.options.isNotEmpty) {
+            widget.onOptionSelected(widget.exercise.options[0].id);
+          }
+          break;
+        case LogicalKeyboardKey.digit2:
+          if (widget.exercise.options.length >= 2) {
+            widget.onOptionSelected(widget.exercise.options[1].id);
+          }
+          break;
+        case LogicalKeyboardKey.digit3:
+          if (widget.exercise.options.length >= 3) {
+            widget.onOptionSelected(widget.exercise.options[2].id);
+          }
+          break;
+        case LogicalKeyboardKey.digit4:
+          if (widget.exercise.options.length >= 4) {
+            widget.onOptionSelected(widget.exercise.options[3].id);
+          }
+          break;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Display the complete formula
-        _buildFormulaDisplay(),
+    return KeyboardListener(
+      focusNode: _focusNode,
+      onKeyEvent: _handleKeyEvent,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Display the complete formula
+          _buildFormulaDisplay(),
 
-        const SizedBox(height: 30),
+          const SizedBox(height: 30),
 
-        // Question prompt
-        const Text(
-          'What is this formula called?',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
+          // Question prompt
+          const Text(
+            'What is this formula called?',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
 
-        const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-        // Display the name options
-        _buildNameOptions(),
+          // Display the name options
+          _buildNameOptions(),
 
-        // Display explanation if showing feedback and answer is incorrect
-        if (widget.showFeedback &&
-            widget.selectedOptionId != null &&
-            widget.selectedOptionId != widget.correctAnswerId)
-          _buildExplanation(),
-      ],
+          // Display explanation if showing feedback and answer is incorrect
+          if (widget.showFeedback &&
+              widget.selectedOptionId != null &&
+              widget.selectedOptionId != widget.correctAnswerId)
+            _buildExplanation(),
+        ],
+      ),
     );
   }
 
@@ -75,8 +145,12 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
 
   Widget _buildNameOptions() {
     return Column(
-      children: widget.exercise.options.map((option) {
+      children: widget.exercise.options.asMap().entries.map((entry) {
+        final int index = entry.key;
+        final option = entry.value;
         final bool isSelected = widget.selectedOptionId == option.id;
+        final bool isFocused =
+            _focusedOptionIndex == index && !widget.showFeedback;
         final bool isCorrect =
             widget.showFeedback && option.id == widget.correctAnswerId;
         final bool isIncorrect =
@@ -89,6 +163,8 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
           borderColor = Colors.red;
         } else if (isSelected) {
           borderColor = Colors.blue;
+        } else if (isFocused) {
+          borderColor = Colors.orange;
         }
 
         return GestureDetector(
@@ -108,17 +184,36 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
                   ? Colors.green.withAlpha(26)
                   : isIncorrect
                   ? Colors.red.withAlpha(26)
+                  : isFocused
+                  ? Colors.orange.withAlpha(26)
                   : null,
             ),
-            child: Text(
-              option.textLabel,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: isSelected || isCorrect
-                    ? FontWeight.bold
-                    : FontWeight.normal,
-              ),
-              textAlign: TextAlign.center,
+            child: Row(
+              children: [
+                if (!widget.showFeedback)
+                  Text(
+                    '${index + 1}. ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: isFocused
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    option.textLabel,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: isSelected || isCorrect || isFocused
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ),
         );

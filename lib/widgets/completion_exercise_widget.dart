@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mnemonicorum/models/exercise.dart';
 import 'package:mnemonicorum/widgets/formula_renderer.dart';
 
@@ -30,19 +31,145 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
   // Map to track which option is placed in which blank
   final Map<String, String> _filledBlanks = {};
 
+  // Keyboard navigation state
+  int _focusedOptionIndex = 0;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-focus when widget is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent && !widget.showFeedback) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowLeft:
+        case LogicalKeyboardKey.arrowUp:
+          setState(() {
+            _focusedOptionIndex =
+                (_focusedOptionIndex - 1) % widget.exercise.options.length;
+            if (_focusedOptionIndex < 0) {
+              _focusedOptionIndex = widget.exercise.options.length - 1;
+            }
+          });
+          break;
+        case LogicalKeyboardKey.arrowRight:
+        case LogicalKeyboardKey.arrowDown:
+          setState(() {
+            _focusedOptionIndex =
+                (_focusedOptionIndex + 1) % widget.exercise.options.length;
+          });
+          break;
+        case LogicalKeyboardKey.enter:
+        case LogicalKeyboardKey.space:
+          _selectFocusedOption();
+          break;
+        case LogicalKeyboardKey.digit1:
+          if (widget.exercise.options.isNotEmpty) {
+            _selectOptionByIndex(0);
+          }
+          break;
+        case LogicalKeyboardKey.digit2:
+          if (widget.exercise.options.length >= 2) {
+            _selectOptionByIndex(1);
+          }
+          break;
+        case LogicalKeyboardKey.digit3:
+          if (widget.exercise.options.length >= 3) {
+            _selectOptionByIndex(2);
+          }
+          break;
+        case LogicalKeyboardKey.digit4:
+          if (widget.exercise.options.length >= 4) {
+            _selectOptionByIndex(3);
+          }
+          break;
+        case LogicalKeyboardKey.tab:
+          // Tab to select the blank (if not already selected)
+          if (_selectedBlankId == null) {
+            final blankComponent = _findBlankComponent();
+            if (blankComponent != null) {
+              setState(() {
+                _selectedBlankId = blankComponent.id;
+              });
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  void _selectFocusedOption() {
+    final option = widget.exercise.options[_focusedOptionIndex];
+    final isUsed =
+        _filledBlanks.containsValue(option.id) ||
+        widget.selectedOptionId == option.id;
+
+    if (!isUsed) {
+      // Auto-select blank if none selected
+      if (_selectedBlankId == null) {
+        final blankComponent = _findBlankComponent();
+        if (blankComponent != null) {
+          _selectedBlankId = blankComponent.id;
+        }
+      }
+
+      if (_selectedBlankId != null) {
+        setState(() {
+          _filledBlanks[_selectedBlankId!] = option.id;
+          _selectedBlankId = null;
+        });
+        widget.onOptionSelected(option.id);
+      }
+    }
+  }
+
+  void _selectOptionByIndex(int index) {
+    if (index < widget.exercise.options.length) {
+      setState(() {
+        _focusedOptionIndex = index;
+      });
+      _selectFocusedOption();
+    }
+  }
+
+  dynamic _findBlankComponent() {
+    final components = widget.exercise.formula.components;
+    if (components.isEmpty) return null;
+
+    return components.firstWhere(
+      (comp) => widget.exercise.question.contains('\\underline{\\hspace{2cm}}'),
+      orElse: () => components.first,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Display the formula with blanks
-        _buildFormulaWithBlanks(),
+    return KeyboardListener(
+      focusNode: _focusNode,
+      onKeyEvent: _handleKeyEvent,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Display the formula with blanks
+          _buildFormulaWithBlanks(),
 
-        const SizedBox(height: 30),
+          const SizedBox(height: 30),
 
-        // Display the options
-        _buildOptions(),
-      ],
+          // Display the options
+          _buildOptions(),
+        ],
+      ),
     );
   }
 
@@ -187,11 +314,16 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
       spacing: 12,
       runSpacing: 12,
       alignment: WrapAlignment.center,
-      children: widget.exercise.options.map((option) {
+      children: widget.exercise.options.asMap().entries.map((entry) {
+        final int index = entry.key;
+        final option = entry.value;
+
         // Check if this option is already used in a blank
         final bool isUsed =
             _filledBlanks.containsValue(option.id) ||
             widget.selectedOptionId == option.id;
+        final bool isFocused =
+            _focusedOptionIndex == index && !widget.showFeedback;
 
         // Determine if the answer is correct (only when showing feedback)
         final bool isCorrect =
@@ -207,6 +339,8 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
           borderColor = Colors.green;
         } else if (isIncorrect) {
           borderColor = Colors.red;
+        } else if (isFocused) {
+          borderColor = Colors.orange;
         }
 
         return GestureDetector(
@@ -233,12 +367,33 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
                     ? Colors.green.withAlpha(26)
                     : isIncorrect
                     ? Colors.red.withAlpha(26)
+                    : isFocused
+                    ? Colors.orange.withAlpha(26)
                     : null,
               ),
-              child: FormulaRenderer(
-                latexExpression: option.latexExpression,
-                semanticDescription: option.textLabel,
-                fontSize: 20,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!widget.showFeedback && !isUsed)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        '${index + 1}.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: isFocused
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  FormulaRenderer(
+                    latexExpression: option.latexExpression,
+                    semanticDescription: option.textLabel,
+                    fontSize: 20,
+                  ),
+                ],
               ),
             ),
           ),
