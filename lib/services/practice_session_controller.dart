@@ -4,6 +4,7 @@ import 'package:mnemonicorum/models/formula.dart';
 import 'package:mnemonicorum/services/exercise_generator.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
+import 'package:mnemonicorum/utils/error_handler.dart';
 
 class PracticeSessionController extends ChangeNotifier {
   final ExerciseGenerator _exerciseGenerator;
@@ -53,16 +54,41 @@ class PracticeSessionController extends ChangeNotifier {
   List<Exercise> _generateExercises(List<Formula> formulas) {
     final generated = <Exercise>[];
     for (var formula in formulas) {
-      generated.add(
-        _exerciseGenerator.generateMatchingExercise(formula, formulas),
+      // Use error handling for each exercise generation with fallback strategies
+      final matchingExercise = ErrorHandler.handleExerciseError(
+        () => _exerciseGenerator.generateMatchingExercise(formula, formulas),
+        'Generate matching exercise for ${formula.name}',
+        fallbackStrategies: [
+          () =>
+              _exerciseGenerator.generateRecognitionExercise(formula, formulas),
+        ],
       );
-      generated.add(
-        _exerciseGenerator.generateCompletionExercise(formula, formulas),
+      if (matchingExercise != null) generated.add(matchingExercise);
+
+      final completionExercise = ErrorHandler.handleExerciseError(
+        () => _exerciseGenerator.generateCompletionExercise(formula, formulas),
+        'Generate completion exercise for ${formula.name}',
+        fallbackStrategies: [
+          () =>
+              _exerciseGenerator.generateRecognitionExercise(formula, formulas),
+        ],
       );
-      generated.add(
-        _exerciseGenerator.generateRecognitionExercise(formula, formulas),
+      if (completionExercise != null) generated.add(completionExercise);
+
+      final recognitionExercise = ErrorHandler.handleExerciseError(
+        () => _exerciseGenerator.generateRecognitionExercise(formula, formulas),
+        'Generate recognition exercise for ${formula.name}',
+      );
+      if (recognitionExercise != null) generated.add(recognitionExercise);
+    }
+
+    // Ensure we have at least some exercises
+    if (generated.isEmpty) {
+      throw ExerciseGenerationException(
+        'Failed to generate any exercises from ${formulas.length} formulas',
       );
     }
+
     generated.shuffle(); // Shuffle the order of exercises
     return generated;
   }

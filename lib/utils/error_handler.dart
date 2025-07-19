@@ -321,13 +321,13 @@ class ErrorHandler {
 
       if (braceCount != 0) return false;
 
-      // Check for common malformed patterns - be more specific to avoid false positives
+      // Check for obviously malformed patterns (incomplete commands)
+      // Only check for very specific incomplete commands that are definitely wrong
       final invalidPatterns = [
-        r'\\inf[^t][^y]', // \inf not followed by 'ty' (should be \infty)
-        r'\\fr[^a][^c]', // \fr not followed by 'ac' (should be \frac)
-        r'\\su[^m][^m]', // \su not followed by 'mm' (should be \sum)
-        r'\\in[^t][^e]', // \in not followed by 'te' (should be \int)
-        r'\\lim[^i][^t]', // \lim not followed by 'it' (should be \lim)
+        r'\\fra(?![cn])', // \fra not followed by c (should be \frac)
+        r'\\su(?![bpmn])', // \su not followed by b, p, m, or n (should be \sum, \sup, \subseteq, etc.)
+        r'\\limi(?![nt])', // \limi not followed by n or t (should be \lim or \limit)
+        r'\\infin(?![ty])', // \infin not followed by ty (should be \infty)
       ];
 
       for (final pattern in invalidPatterns) {
@@ -336,12 +336,18 @@ class ErrorHandler {
         }
       }
 
-      // Additional checks for common LaTeX syntax
-      // Check for unmatched backslashes (except at the end)
-      if (latex.contains('\\') && !latex.endsWith('\\')) {
-        // Check if there are any backslashes not followed by a letter or special character
-        final backslashPattern = RegExp(r'\\[^a-zA-Z\\\{\}\[\]\(\)\^_\{\}]');
-        if (backslashPattern.hasMatch(latex)) {
+      // Check for unmatched backslashes - be more permissive
+      // Only flag backslashes that are clearly malformed
+      if (latex.contains(r'\')) {
+        // Check for backslashes followed by nothing or whitespace (incomplete commands)
+        final incompleteCommandPattern = RegExp(r'\\(?:\s|$)');
+        if (incompleteCommandPattern.hasMatch(latex)) {
+          return false;
+        }
+
+        // Check for backslashes followed by numbers (usually invalid)
+        final backslashNumberPattern = RegExp(r'\\[0-9]');
+        if (backslashNumberPattern.hasMatch(latex)) {
           return false;
         }
       }

@@ -155,33 +155,42 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
             children: [
               // Question: Display the left side with appropriate relation symbol
               Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: FormulaRenderer(
-                        latexExpression: questionFormulaComponent.latexPart,
-                        semanticDescription:
-                            questionFormulaComponent.description,
-                        fontSize: 30,
-                      ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width - 32,
                     ),
-                    const SizedBox(width: 16),
-                    // Add appropriate relation symbol
-                    FormulaRenderer(
-                      latexExpression: _getRelationSymbol(),
-                      semanticDescription: "等于",
-                      fontSize: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: FormulaRenderer(
+                            latexExpression: questionFormulaComponent.latexPart,
+                            semanticDescription:
+                                questionFormulaComponent.description,
+                            fontSize: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Add appropriate relation symbol
+                        FormulaRenderer(
+                          latexExpression: _getRelationSymbol(),
+                          semanticDescription: "等于",
+                          fontSize: 30,
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          '?',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    const Text(
-                      '?',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 40),

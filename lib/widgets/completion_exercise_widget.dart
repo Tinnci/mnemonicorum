@@ -192,45 +192,60 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
       orElse: () => components.first,
     );
 
-    // Create a row of formula parts with a blank space
+    // Create a wrapping row of formula parts with a blank space
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Display components before the blank
-          ...components
-              .where(
-                (comp) =>
-                    comp.id != blankComponent.id &&
-                    components.indexOf(comp) <
-                        components.indexOf(blankComponent),
-              )
-              .map(
-                (comp) => FormulaRenderer(
-                  latexExpression: comp.latexPart,
-                  semanticDescription: comp.description,
-                ),
-              ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width - 32,
+          ),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              // Display components before the blank
+              ...components
+                  .where(
+                    (comp) =>
+                        comp.id != blankComponent.id &&
+                        components.indexOf(comp) <
+                            components.indexOf(blankComponent),
+                  )
+                  .map(
+                    (comp) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: FormulaRenderer(
+                        latexExpression: comp.latexPart,
+                        semanticDescription: comp.description,
+                      ),
+                    ),
+                  ),
 
-          // Display the blank or the selected option
-          _buildBlankSpace(blankComponent),
+              // Display the blank or the selected option
+              _buildBlankSpace(blankComponent),
 
-          // Display components after the blank
-          ...components
-              .where(
-                (comp) =>
-                    comp.id != blankComponent.id &&
-                    components.indexOf(comp) >
-                        components.indexOf(blankComponent),
-              )
-              .map(
-                (comp) => FormulaRenderer(
-                  latexExpression: comp.latexPart,
-                  semanticDescription: comp.description,
-                ),
-              ),
-        ],
+              // Display components after the blank
+              ...components
+                  .where(
+                    (comp) =>
+                        comp.id != blankComponent.id &&
+                        components.indexOf(comp) >
+                            components.indexOf(blankComponent),
+                  )
+                  .map(
+                    (comp) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: FormulaRenderer(
+                        latexExpression: comp.latexPart,
+                        semanticDescription: comp.description,
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+        ),
       ),
     );
   }

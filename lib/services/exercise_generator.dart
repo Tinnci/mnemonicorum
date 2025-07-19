@@ -507,42 +507,8 @@ class ExerciseGenerator {
 
   /// Validate LaTeX expression for basic syntax correctness
   bool _isValidLatex(String latex) {
-    // Check for common LaTeX command integrity - be more specific to avoid false positives
-    final invalidPatterns = [
-      r'\\inf[^t][^y]', // \inf not followed by 'ty' (should be \infty)
-      r'\\fr[^a][^c]', // \fr not followed by 'ac' (should be \frac)
-      r'\\su[^m][^m]', // \su not followed by 'mm' (should be \sum)
-      r'\\in[^t][^e]', // \in not followed by 'te' (should be \int)
-      r'\\lim[^i][^t]', // \lim not followed by 'it' (should be \lim)
-    ];
-
-    for (final pattern in invalidPatterns) {
-      if (RegExp(pattern).hasMatch(latex)) {
-        return false;
-      }
-    }
-
-    // Check for balanced braces
-    int braceCount = 0;
-    for (int i = 0; i < latex.length; i++) {
-      if (latex[i] == '{') braceCount++;
-      if (latex[i] == '}') braceCount--;
-      if (braceCount < 0) return false; // More closing than opening
-    }
-
-    if (braceCount != 0) return false; // Should be balanced
-
-    // Additional checks for common LaTeX syntax
-    // Check for unmatched backslashes (except at the end)
-    if (latex.contains('\\') && !latex.endsWith('\\')) {
-      // Check if there are any backslashes not followed by a letter or special character
-      final backslashPattern = RegExp(r'\\[^a-zA-Z\\\{\}\[\]\(\)\^_\{\}]');
-      if (backslashPattern.hasMatch(latex)) {
-        return false;
-      }
-    }
-
-    return true;
+    // Use the same validation logic as ErrorHandler for consistency
+    return ErrorHandler.isValidLatexExpression(latex);
   }
 
   /// Apply minor modifications to create plausible distractors
