@@ -289,7 +289,7 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
           color: backgroundColor,
           boxShadow: [
             BoxShadow(
-              color: borderColor.withOpacity(0.3),
+              color: borderColor.withValues(alpha: 0.3),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -326,7 +326,7 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
             color: _selectedBlankId == blankComponent.id
                 ? Theme.of(
                     context,
-                  ).colorScheme.primaryContainer.withOpacity(0.3)
+                  ).colorScheme.primaryContainer.withValues(alpha: (0.3 * 255))
                 : Colors.grey.shade50,
           ),
           child: Text(

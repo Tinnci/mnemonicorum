@@ -127,6 +127,7 @@ class _ProgressContent extends StatelessWidget {
                               padding: const EdgeInsets.all(12.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min, // 添加这行
                                 children: [
                                   Icon(
                                     achievement.icon,
@@ -138,25 +139,30 @@ class _ProgressContent extends StatelessWidget {
                                           ).colorScheme.onSurfaceVariant,
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
-                                    achievement.title,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: achievement.isUnlocked
-                                          ? Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimaryContainer
-                                          : Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
+                                  Expanded(
+                                    // 使用Expanded包装文本
+                                    child: Text(
+                                      achievement.title,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: achievement.isUnlocked
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimaryContainer
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     achievement.description,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11, // 稍微减小字号
                                       color: achievement.isUnlocked
                                           ? Theme.of(
                                               context,

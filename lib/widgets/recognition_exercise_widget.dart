@@ -133,7 +133,9 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
       elevation: 6, // 增加阴影，使其更突出
       margin: const EdgeInsets.all(24.0), // 增加外边距
       // 使用主题颜色，更好地适配深色/浅色模式
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: (0.5 * 255)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(32.0), // 增加内边距，提供更多呼吸空间
@@ -190,7 +192,9 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
             boxShadow: isSelected || isFocused
                 ? [
                     BoxShadow(
-                      color: (borderColor ?? Colors.grey).withOpacity(0.3),
+                      color: (borderColor ?? Colors.grey).withValues(
+                        alpha: (0.3 * 255),
+                      ),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
