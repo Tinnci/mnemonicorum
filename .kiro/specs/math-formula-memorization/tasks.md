@@ -381,17 +381,72 @@
     - Test category navigation and formula set selection
     - _Requirements: 4.1, 4.3, 6.3, 6.4_
 
-- [ ] 14. Final integration and polish
-  - [ ] 14.1 Integrate all components and test complete user flows
+- [ ] 14. Enhance practice session and results experience
+
+  - [x] 14.1 Fix results screen display issues
+
+
+    - Root cause analysis: Results screen shows "0/0" and "0.00%" when no practice data exists
+    - Problem: Poor user experience for new users or after progress reset
+    - Solution: Add friendly messages for empty states and first-time users
+    - Display encouraging messages like "开始你的第一次练习！" instead of confusing statistics
+    - Add proper handling for edge cases (no exercises, all correct, all incorrect)
+    - _Requirements: 4.1, 4.4, 7.4 - Better user experience_
+
+  - [x] 14.2 Add repeat practice functionality
+
+
+
+    - Root cause analysis: Users cannot immediately retry the same formula set
+    - Problem: Results screen only offers "返回主页" with no repeat option
+    - Solution: Add "再次练习" button to restart the same practice session
+    - Implement "继续练习" option for additional rounds with same formulas
+    - Add "练习其他公式" button to explore related formula sets
+    - Store current formula set context for easy repetition
+    - _Requirements: 1.1, 1.4, 7.3 - Enhanced practice workflow_
+
+  - [ ] 14.3 Implement adaptive wrong-answer review system
+    - Root cause analysis: No mechanism to review and retry incorrect answers
+    - Problem: Users cannot focus on formulas they struggle with
+    - Solution: Track incorrect answers during practice sessions
+    - Create "错题回顾" mode that focuses on previously missed questions
+    - Implement spaced repetition algorithm for difficult formulas
+    - Add "重点练习" option that prioritizes low-accuracy formulas
+    - Generate targeted exercises based on user's weak areas
+    - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3 - Adaptive learning_
+
+  - [ ] 14.4 Enhance practice session state management
+    - Root cause analysis: Practice sessions don't persist user preferences or context
+    - Problem: Loss of context when navigating between screens
+    - Solution: Implement session persistence and state recovery
+    - Add ability to pause and resume practice sessions
+    - Store user's preferred exercise types and difficulty levels
+    - Implement smart formula selection based on progress history
+    - Add session analytics to track learning patterns
+    - _Requirements: 4.4, 6.3, 6.4 - Persistent learning experience_
+
+  - [ ] 14.5 Create comprehensive practice analytics
+    - Implement detailed session analytics and learning insights
+    - Add progress visualization with charts and trends
+    - Create personalized learning recommendations
+    - Track time spent on different formula types and difficulty levels
+    - Generate weekly/monthly progress reports
+    - Add comparative analysis (accuracy trends, improvement areas)
+    - _Requirements: 4.1, 4.2, 4.4 - Data-driven learning insights_
+
+- [ ] 15. Final integration and polish
+  - [ ] 15.1 Integrate all components and test complete user flows
     - Connect all screens with proper navigation and state management
     - Verify smooth exercise transitions and progress updates
     - Test offline functionality and data persistence
     - Test adaptive navigation across different screen sizes and orientations
+    - Test new practice session enhancements and repeat functionality
     - _Requirements: 6.2, 6.3, 7.1, 7.2, 7.3_
 
-  - [ ] 14.2 Add final UI polish and accessibility features
+  - [ ] 15.2 Add final UI polish and accessibility features
     - Implement haptic feedback for answer selections
     - Add accessibility labels for screen readers
     - Fine-tune animations and visual feedback systems
     - Ensure adaptive navigation meets accessibility standards
+    - Polish new results screen and practice options UI
     - _Requirements: 7.1, 7.2, 7.3, 7.4_

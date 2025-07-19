@@ -38,7 +38,12 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final correct = int.parse(state.uri.queryParameters['correct'] ?? '0');
         final total = int.parse(state.uri.queryParameters['total'] ?? '0');
-        return ResultsScreen(correctAnswers: correct, totalQuestions: total);
+        final formulaSetId = state.uri.queryParameters['formulaSetId'];
+        return ResultsScreen(
+          correctAnswers: correct,
+          totalQuestions: total,
+          formulaSetId: formulaSetId,
+        );
       },
     ),
     GoRoute(

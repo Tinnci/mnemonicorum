@@ -130,7 +130,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                   // Check if the context is still valid
                   if (currentContext.mounted) {
                     GoRouter.of(currentContext).go(
-                      '/results?correct=${controller.correctAnswers}&total=$totalQuestions',
+                      '/results?correct=${controller.correctAnswers}&total=$totalQuestions&formulaSetId=${widget.formulaSetId}',
                     );
                   }
                 }
