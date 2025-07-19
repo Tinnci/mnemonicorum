@@ -53,9 +53,15 @@ class PracticeSessionController extends ChangeNotifier {
   List<Exercise> _generateExercises(List<Formula> formulas) {
     final generated = <Exercise>[];
     for (var formula in formulas) {
-      generated.add(_exerciseGenerator.generateMatchingExercise(formula));
-      generated.add(_exerciseGenerator.generateCompletionExercise(formula));
-      generated.add(_exerciseGenerator.generateRecognitionExercise(formula));
+      generated.add(
+        _exerciseGenerator.generateMatchingExercise(formula, formulas),
+      );
+      generated.add(
+        _exerciseGenerator.generateCompletionExercise(formula, formulas),
+      );
+      generated.add(
+        _exerciseGenerator.generateRecognitionExercise(formula, formulas),
+      );
     }
     generated.shuffle(); // Shuffle the order of exercises
     return generated;

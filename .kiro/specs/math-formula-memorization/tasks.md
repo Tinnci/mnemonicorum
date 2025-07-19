@@ -232,24 +232,48 @@
     - Build retry mechanisms for failed operations
     - _Requirements: 2.1, 6.2_
 
-- [ ] 10. Create comprehensive test suite
-  - [ ] 10.1 Write unit tests
-    - Test formula parsing and exercise generation logic
-    - Verify progress calculation and mastery level algorithms
-    - Test data model serialization and Hive storage operations
-    - _Requirements: All requirements validation_
+- [x] 10. Enhance local exercise generation logic
 
-  - [ ] 10.2 Write widget tests
-    - Test FormulaRenderer with various LaTeX expressions
-    - Verify exercise widget interactions and feedback systems
-    - Test navigation flows and screen transitions
-    - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2_
 
-  - [ ] 10.3 Write integration tests
-    - Test complete practice session flows from start to finish
-    - Verify progress persistence and retrieval across app restarts
-    - Test category navigation and formula set selection
-    - _Requirements: 4.1, 4.3, 6.3, 6.4_
+
+
+
+  - [x] 10.1 Strengthen ExerciseGenerator service
+
+
+    - Modify existing generation methods to accept all formulas context for better distractor generation
+    - Improve distractor logic to use formulas from same category instead of placeholder text
+    - Ensure generated exercises have contextually appropriate wrong answers
+    - _Requirements: 5.1, 5.2, 5.3_
+
+  - [x] 10.2 Improve Recognition Exercise generation logic
+
+
+    - Modify generateRecognitionExercise to accept all formulas from same category
+    - Generate distractors by randomly selecting 3 other formula names from the same category
+    - Ensure distractor names don't duplicate the correct answer
+    - Replace current placeholder "错误公式名称" with actual formula names
+    - _Requirements: 5.3, 1.3, 1.5_
+
+  - [x] 10.3 Improve Matching Exercise generation logic
+
+
+    - Modify generateMatchingExercise to accept all formulas from same category for better distractors
+    - Generate 3 structurally similar but mathematically incorrect distractors using strategies:
+      - Component borrowing from other formulas in same category
+      - Variable/symbol swapping (u ↔ v, + ↔ -, sin ↔ cos)
+      - Minor modifications (adding/removing differential symbols, changing exponents)
+    - Replace current simple component reuse with sophisticated distractor generation
+    - _Requirements: 1.1, 1.2, 1.3, 5.1_
+
+  - [x] 10.4 Improve Completion Exercise generation logic
+
+
+    - Modify generateCompletionExercise to accept all formulas from same category
+    - Generate distractors from similar components in same formula category instead of "假选项"
+    - Ensure distractors are contextually reasonable and mathematically plausible
+    - Use components from other formulas that could logically fit the blank space
+    - _Requirements: 5.2, 1.3, 1.4_
 
 - [x] 11. Implement adaptive navigation system
 
@@ -284,15 +308,35 @@
     - Add visual indicators for active navigation items in both modes
     - _Requirements: 7.1, 7.2 - Cross-platform usability_
 
-- [ ] 12. Final integration and polish
-  - [ ] 12.1 Integrate all components and test complete user flows
+- [ ] 12. Create comprehensive test suite
+  - [ ] 12.1 Write unit tests
+    - Priority: Test ExerciseGenerator extensively - create test cases for each exercise type
+    - Verify distractor generation logic is predictable and handles edge cases (insufficient formulas in category)
+    - Test progress calculation and mastery level algorithms
+    - Test data model serialization and Hive storage operations
+    - _Requirements: All requirements validation_
+
+  - [ ] 12.2 Write widget tests
+    - Test FormulaRenderer with various LaTeX expressions
+    - Verify exercise widget interactions and feedback systems
+    - Test navigation flows and screen transitions
+    - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2_
+
+  - [ ] 12.3 Write integration tests
+    - Test complete practice session flows from start to finish
+    - Verify progress persistence and retrieval across app restarts
+    - Test category navigation and formula set selection
+    - _Requirements: 4.1, 4.3, 6.3, 6.4_
+
+- [ ] 13. Final integration and polish
+  - [ ] 13.1 Integrate all components and test complete user flows
     - Connect all screens with proper navigation and state management
     - Verify smooth exercise transitions and progress updates
     - Test offline functionality and data persistence
     - Test adaptive navigation across different screen sizes and orientations
     - _Requirements: 6.2, 6.3, 7.1, 7.2, 7.3_
 
-  - [ ] 12.2 Add final UI polish and accessibility features
+  - [ ] 13.2 Add final UI polish and accessibility features
     - Implement haptic feedback for answer selections
     - Add accessibility labels for screen readers
     - Fine-tune animations and visual feedback systems
