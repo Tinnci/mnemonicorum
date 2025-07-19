@@ -16,7 +16,16 @@ class FormulaRepository {
         final String response = await rootBundle.loadString(
           'assets/formulas/categories.json',
         );
-        final data = await json.decode(response);
+
+        late final dynamic data;
+        try {
+          data = await json.decode(response);
+        } catch (e) {
+          throw FormulaLoadingException(
+            'Invalid JSON format in categories.json. Please check LaTeX expressions are properly escaped.',
+            e,
+          );
+        }
 
         // Assuming categories.json contains a list of categories
         final categories = (data as List)

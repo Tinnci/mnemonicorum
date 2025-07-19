@@ -1,0 +1,54 @@
+{
+  "formulas": [
+    {
+      "id": "pythagorean_identity",
+      "name": "勾股定理恒等式",
+      "latexExpression": "\\sin^2 x + \\cos^2 x = 1",
+      "category": "trigonometry",
+      "subcategory": "identities",
+      "difficulty": "easy",
+      "tags": ["trigonometry", "identity", "sine", "cosine"],
+      "description": "基本的三角函数勾股定理恒等式。",
+      "components": [
+        {
+          "id": "pi_lhs",
+          "latexPart": "\\sin^2 x + \\cos^2 x",
+          "type": "leftSide",
+          "description": "sin平方x加cos平方x"
+        },
+        {
+          "id": "pi_rhs",
+          "latexPart": "1",
+          "type": "rightSide",
+          "description": "1"
+        }
+      ],
+      "semanticDescription": "sin平方x加cos平方x等于1。"
+    },
+    {
+      "id": "sin_a_plus_b",
+      "name": "sin(a+b)",
+      "latexExpression": "\\sin(a + b) = \\sin a \\cos b + \\cos a \\sin b",
+      "category": "trigonometry",
+      "subcategory": "addition",
+      "difficulty": "medium",
+      "tags": ["trigonometry", "addition", "sine"],
+      "description": "sin函数的加法公式。",
+      "components": [
+        {
+          "id": "sab_lhs",
+          "latexPart": "\\sin(a + b)",
+          "type": "leftSide",
+          "description": "sin(a加b)"
+        },
+        {
+          "id": "sab_rhs",
+          "latexPart": "\\sin a \\cos b + \\cos a \\sin b",
+          "type": "rightSide",
+          "description": "sin a cos b加cos a sin b"
+        }
+      ],
+      "semanticDescription": "sin(a加b)等于sin a cos b加cos a sin b。"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
+import 'package:mnemonicorum/models/formula.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryId;
@@ -55,6 +56,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
       }
       _isLoading = false;
     });
+  }
+
+  String _getDifficultyName(DifficultyLevel difficulty) {
+    switch (difficulty) {
+      case DifficultyLevel.easy:
+        return 'easy';
+      case DifficultyLevel.medium:
+        return 'medium';
+      case DifficultyLevel.hard:
+        return 'hard';
+    }
   }
 
   @override
@@ -125,7 +137,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            subtitle: Text('难度: ${formulaSet.difficulty.name}'),
+                            subtitle: Text(
+                              '难度: ${_getDifficultyName(formulaSet.difficulty)}',
+                            ),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () {
                               // Navigate to Practice Session Screen

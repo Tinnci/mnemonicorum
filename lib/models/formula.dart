@@ -12,6 +12,19 @@ enum DifficultyLevel {
   hard,
 }
 
+extension DifficultyLevelExtension on DifficultyLevel {
+  String get name {
+    switch (this) {
+      case DifficultyLevel.easy:
+        return 'easy';
+      case DifficultyLevel.medium:
+        return 'medium';
+      case DifficultyLevel.hard:
+        return 'hard';
+    }
+  }
+}
+
 @HiveType(typeId: 6)
 enum ComponentType {
   @HiveField(0)

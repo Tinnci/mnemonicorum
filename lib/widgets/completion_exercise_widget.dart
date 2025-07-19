@@ -51,8 +51,18 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
     final components = widget.exercise.formula.components;
 
     // Find the component that should be replaced with a blank
+    if (components.isEmpty) {
+      return const Center(
+        child: Text(
+          'Error: No formula components available',
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
     final blankComponent = components.firstWhere(
       (comp) => comp.id == widget.exercise.question,
+      orElse: () => components.first,
     );
 
     // Create a row of formula parts with a blank space

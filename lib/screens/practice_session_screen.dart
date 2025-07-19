@@ -180,7 +180,11 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                 leading: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    context.pop(); // Go back to previous screen
+                    if (context.canPop()) {
+                      context.pop(); // Go back to previous screen
+                    } else {
+                      context.go('/'); // Go to home screen if nothing to pop
+                    }
                   },
                 ),
               ),
