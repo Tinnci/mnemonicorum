@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ResultsScreen extends StatelessWidget {
   final int correctAnswers;
@@ -132,13 +133,12 @@ class ResultsScreen extends StatelessWidget {
       children: [
         Icon(icon, size: 60, color: color),
         const SizedBox(height: 16),
-        Text(
+        AutoSizeText(
           message,
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: color),
+          maxLines: 1,
+          minFontSize: 20, // 设定最小字号
+          maxFontSize: 28, // 设定最大字号
         ),
       ],
     );

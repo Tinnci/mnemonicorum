@@ -106,9 +106,10 @@ class _ProgressContent extends StatelessWidget {
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
+                        // 使用自适应列数布局
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 200, // 成就卡片可以更小一些
                               childAspectRatio: 1.5,
                               crossAxisSpacing: 8,
                               mainAxisSpacing: 8,

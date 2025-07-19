@@ -107,8 +107,9 @@ class _PracticeContent extends StatelessWidget {
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                // 使用自适应列数布局
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 250, // 设定每个元素的最大宽度
                   childAspectRatio: 1.2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,

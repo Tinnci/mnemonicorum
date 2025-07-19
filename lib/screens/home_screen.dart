@@ -3,10 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
-import 'package:mnemonicorum/widgets/progress_dashboard.dart';
 import 'package:mnemonicorum/widgets/adaptive_scaffold.dart';
-import 'package:mnemonicorum/utils/latex_renderer_utils.dart';
+import 'package:mnemonicorum/widgets/progress_dashboard.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:mnemonicorum/utils/latex_renderer_utils.dart';
 import 'package:mnemonicorum/models/category.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -154,12 +155,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
+                    // 使用 SliverGridDelegateWithMaxCrossAxisExtent 实现自适应布局
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 250, // 设定每个元素的最大宽度
                           mainAxisSpacing: 16,
-                          childAspectRatio: 1.2,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 1.2, // 根据需要调整宽高比
                         ),
                     itemCount: categories.length,
                     cacheExtent:
@@ -208,15 +210,12 @@ class _OptimizedCategoryCard extends StatelessWidget {
               // Optimized icon rendering
               Icon(Icons.category, size: 50, color: Colors.blue.shade700),
               const SizedBox(height: 10),
-              Text(
+              AutoSizeText(
                 category.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                minFontSize: 14, // 保证在小卡片上也能显示
               ),
             ],
           ),
