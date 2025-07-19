@@ -261,7 +261,7 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
                             ? [
                                 BoxShadow(
                                   color: (borderColor ?? Colors.grey)
-                                      .withValues(alpha: (0.3 * 255)),
+                                      .withValues(alpha: (0.3)),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),

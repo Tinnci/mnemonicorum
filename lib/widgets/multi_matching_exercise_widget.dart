@@ -27,7 +27,7 @@ class MultiMatchingExerciseWidget extends StatefulWidget {
 class _MultiMatchingExerciseWidgetState
     extends State<MultiMatchingExerciseWidget> {
   ExerciseOption? _selectedOption;
-  Set<String> _matchedPairIds = {}; // 存放已匹配对的 pairId
+  final Set<String> _matchedPairIds = {}; // 存放已匹配对的 pairId
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -148,7 +148,7 @@ class _MultiMatchingExerciseWidgetState
         Expanded(child: _buildColumn(leftColumn, '公式名称')),
 
         // 中间：连接线区域
-        Container(width: 100, child: _buildConnectionLines()),
+        SizedBox(width: 100, child: _buildConnectionLines()),
 
         // 右侧：公式表达式
         Expanded(child: _buildColumn(rightColumn, '公式表达式')),
@@ -192,10 +192,10 @@ class _MultiMatchingExerciseWidgetState
     Color borderColor;
 
     if (isMatched) {
-      cardColor = Colors.green.withOpacity(0.2);
+      cardColor = Colors.green.withValues(alpha: 0.2);
       borderColor = Colors.green;
     } else if (isSelected) {
-      cardColor = Theme.of(context).colorScheme.primary.withOpacity(0.2);
+      cardColor = Theme.of(context).colorScheme.primary.withValues(alpha: 0.2);
       borderColor = Theme.of(context).colorScheme.primary;
     } else {
       cardColor = Colors.grey.shade100;

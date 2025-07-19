@@ -184,10 +184,11 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
               value: _sessionController,
               child: Consumer<PracticeSessionController>(
                 builder: (context, controller, child) {
-                  final currentExercise = controller.currentExercise;
                   final totalQuestions = controller.totalQuestions;
                   final currentQuestionNumber =
                       controller.currentExerciseIndex + 1;
+
+                  // 1. 首先检查会话是否已经完成
                   if (controller.isSessionCompleted) {
                     // Complete session and check for achievements, then navigate to results screen
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -214,6 +215,10 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                     });
                     return const Scaffold(body: Center(child: Text('会话完成！')));
                   }
+
+                  // 2. 在确认会话未完成后，再安全地获取当前练习
+                  final currentExercise = controller.currentExercise;
+
                   if (currentExercise == null) {
                     return const Scaffold(
                       body: Center(child: CircularProgressIndicator()),

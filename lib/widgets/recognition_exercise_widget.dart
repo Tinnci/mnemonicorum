@@ -135,7 +135,7 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
       // 使用主题颜色，更好地适配深色/浅色模式
       color: Theme.of(
         context,
-      ).colorScheme.surfaceContainerHighest.withValues(alpha: (0.5 * 255)),
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: (0.5)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(32.0), // 增加内边距，提供更多呼吸空间
@@ -193,7 +193,7 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
                 ? [
                     BoxShadow(
                       color: (borderColor ?? Colors.grey).withValues(
-                        alpha: (0.3 * 255),
+                        alpha: (0.3),
                       ),
                       blurRadius: 4,
                       offset: const Offset(0, 2),

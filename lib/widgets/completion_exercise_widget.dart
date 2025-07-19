@@ -326,7 +326,7 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
             color: _selectedBlankId == blankComponent.id
                 ? Theme.of(
                     context,
-                  ).colorScheme.primaryContainer.withValues(alpha: (0.3 * 255))
+                  ).colorScheme.primaryContainer.withValues(alpha: (0.3))
                 : Colors.grey.shade50,
           ),
           child: Text(

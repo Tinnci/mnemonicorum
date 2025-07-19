@@ -48,7 +48,7 @@ class ErrorHandler {
           Text(
             latexExpression,
             style: TextStyle(
-              color: textColor.withAlpha((0.8 * 255).round()),
+              color: textColor.withAlpha((0.8).round()),
               fontSize: fontSize * 0.9,
               fontStyle: FontStyle.italic,
               fontFamily: 'monospace',
