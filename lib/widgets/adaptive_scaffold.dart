@@ -313,7 +313,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold>
             ? NavigationRailLabelType.all
             : NavigationRailLabelType.none,
         backgroundColor: Colors.transparent,
-        elevation: 0,
+        elevation: null,
         useIndicator: true,
         indicatorColor: Theme.of(context).colorScheme.primary.withAlpha(31),
         selectedIconTheme: IconThemeData(
