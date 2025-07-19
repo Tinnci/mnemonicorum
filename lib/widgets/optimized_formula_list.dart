@@ -126,7 +126,6 @@ class _FormulaListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // No longer needs a fixed-height SizedBox
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
@@ -136,68 +135,77 @@ class _FormulaListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: 200,
-                  height: 60, // 固定高度
+          // 移除了 IntrinsicHeight，并调整了 Row 的对齐方式
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center, // 垂直居中对齐
+            children: [
+              // --- 💡【优化部分】---
+              // 1. 使用 Flexible 替代 SizedBox，实现响应式宽度
+              Flexible(
+                flex: 2, // 分配 2/5 的空间给公式
+                child: SizedBox(
+                  height: 60, // 保持公式区域的固定高度
                   child: FittedBox(
-                    // 关键：向内 scaleDown
                     fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft, // 公式内容靠左对齐
                     child: FormulaRenderer(
                       latexExpression: formula.latexExpression,
-                      fontSize: 28, // 不要再传过大的 fontSize
+                      fontSize: 24, // 可以适当调整基础字号
                       semanticDescription: formula.description,
                       useCache: true,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        formula.name,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+              ),
+
+              // --- 【优化结束】---
+              const SizedBox(width: 16),
+
+              // 2. 将文本部分也用 Expanded 包裹，并设置 flex 比例
+              Expanded(
+                flex: 3, // 分配 3/5 的空间给文本
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      formula.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        formula.description,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                // Category indicator
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withAlpha(26),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    formula.category,
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formula.description,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // 分类标签保持不变，它尺寸较小，不参与flex布局
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withAlpha(26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  formula.category,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
