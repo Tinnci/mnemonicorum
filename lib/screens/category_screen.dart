@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
+import 'package:mnemonicorum/widgets/adaptive_scaffold.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
 import 'package:mnemonicorum/models/formula.dart';
 
@@ -86,8 +87,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
     );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(category.name)),
+    return AdaptiveScaffold(
+      currentRoute: '/category/${widget.categoryId}',
+      title: category.name,
       body: _isLoading
           ? const Center(
               child: Column(

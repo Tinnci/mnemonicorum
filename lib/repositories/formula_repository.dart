@@ -101,6 +101,10 @@ class FormulaRepository {
     return _categories;
   }
 
+  List<FormulaCategory> getCategories() {
+    return _categories;
+  }
+
   Future<List<Formula>> getFormulasByCategory(String categoryId) async {
     // Use lazy loading for better performance
     await _lazyLoadCategoryFormulas(categoryId);

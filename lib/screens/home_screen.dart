@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
 import 'package:mnemonicorum/widgets/progress_dashboard.dart';
+import 'package:mnemonicorum/widgets/adaptive_scaffold.dart';
 import 'package:mnemonicorum/utils/latex_renderer_utils.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
 import 'package:mnemonicorum/models/category.dart';
@@ -76,18 +77,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final achievementSystem = Provider.of<AchievementSystem>(context);
     final categories = formulaRepository.getAllCategories();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('主页'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.go('/settings');
-            },
-          ),
-        ],
-      ),
+    return AdaptiveScaffold(
+      currentRoute: '/home',
+      title: 'Home',
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import 'package:mnemonicorum/models/formula.dart';
@@ -55,15 +56,34 @@ class FormulaCategory {
   final String description;
   @HiveField(3)
   final List<FormulaSet> formulaSets;
+  @HiveField(4)
+  final IconData icon;
 
   FormulaCategory({
     required this.id,
     required this.name,
     required this.description,
     required this.formulaSets,
+    this.icon = Icons.category,
   });
 
   factory FormulaCategory.fromJson(Map<String, dynamic> json) {
+    // Map icon names to IconData
+    IconData getIconFromName(String? iconName) {
+      switch (iconName) {
+        case 'functions':
+          return Icons.functions;
+        case 'calculate':
+          return Icons.calculate;
+        case 'analytics':
+          return Icons.analytics;
+        case 'science':
+          return Icons.science;
+        default:
+          return Icons.category;
+      }
+    }
+
     return FormulaCategory(
       id: json['id'],
       name: json['name'],
@@ -71,6 +91,7 @@ class FormulaCategory {
       formulaSets: (json['formulaSets'] as List)
           .map((e) => FormulaSet.fromJson(e))
           .toList(),
+      icon: getIconFromName(json['icon']),
     );
   }
 

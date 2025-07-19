@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
+import 'package:mnemonicorum/widgets/adaptive_scaffold.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,8 +19,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final progressService = Provider.of<ProgressService>(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('设置')),
+    return AdaptiveScaffold(
+      currentRoute: '/settings',
+      title: 'Settings',
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [

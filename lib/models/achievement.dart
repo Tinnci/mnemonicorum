@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 part 'achievement.g.dart';
@@ -43,6 +44,29 @@ class Achievement {
     this.isUnlocked = false,
     this.unlockedAt,
   });
+
+  // Getter to convert iconName string to IconData
+  IconData get icon {
+    switch (iconName) {
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'functions':
+        return Icons.functions;
+      case 'change_history':
+        return Icons.change_history;
+      case 'star':
+        return Icons.star;
+      case 'emoji_events':
+        return Icons.emoji_events;
+      case 'school':
+        return Icons.school;
+      default:
+        return Icons.emoji_events;
+    }
+  }
+
+  // Getter for title (alias for name)
+  String get title => name;
 
   Achievement copyWith({
     String? id,

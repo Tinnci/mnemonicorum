@@ -244,6 +244,10 @@ class AchievementSystem extends ChangeNotifier {
     return achievements.where((a) => !a.isUnlocked).toList();
   }
 
+  List<Achievement> getAllAchievements() {
+    return achievements;
+  }
+
   Future<void> showAchievementNotification(
     BuildContext context,
     Achievement achievement,

@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:mnemonicorum/screens/onboarding_screen.dart';
 import 'package:mnemonicorum/screens/home_screen.dart';
+import 'package:mnemonicorum/screens/practice_screen.dart';
+import 'package:mnemonicorum/screens/progress_screen.dart';
 import 'package:mnemonicorum/screens/category_screen.dart';
 import 'package:mnemonicorum/screens/practice_session_screen.dart';
 import 'package:mnemonicorum/screens/results_screen.dart';
@@ -12,6 +14,14 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+    GoRoute(
+      path: '/practice',
+      builder: (context, state) => const PracticeScreen(),
+    ),
+    GoRoute(
+      path: '/progress',
+      builder: (context, state) => const ProgressScreen(),
+    ),
     GoRoute(
       path: '/category/:categoryId',
       builder: (context, state) =>
