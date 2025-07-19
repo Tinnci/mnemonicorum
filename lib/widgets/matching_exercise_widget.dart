@@ -150,56 +150,65 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 题目区域 - 使用Card包装，增加视觉焦点
-            Card(
-              elevation: 2,
-              margin: const EdgeInsets.symmetric(vertical: 24),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      FormulaRenderer(
-                        latexExpression: questionFormulaComponent.latexPart,
-                        semanticDescription:
-                            questionFormulaComponent.description,
-                        fontSize: 32, // 增大主公式字号
-                      ),
-                      const SizedBox(width: 16),
-                      // 关系符号
-                      FormulaRenderer(
-                        latexExpression: _getRelationSymbol(),
-                        semanticDescription: "等于",
-                        fontSize: 32,
-                      ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        '?',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange, // 使用醒目的颜色
-                        ),
-                      ),
-                    ],
+            const Spacer(flex: 2), // 顶部留白
+            // 问题区域：分栏对齐设计
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 左侧：题目已知部分
+                FormulaRenderer(
+                  latexExpression: questionFormulaComponent.latexPart,
+                  semanticDescription: questionFormulaComponent.description,
+                  fontSize: 28,
+                ),
+                const SizedBox(width: 16),
+
+                // 中间：突出的关系符号
+                FormulaRenderer(
+                  latexExpression: _getRelationSymbol(),
+                  semanticDescription: "等于",
+                  fontSize: 40, // 放大等号
+                ),
+                const SizedBox(width: 16),
+
+                // 右侧：目标区域（虚线框占位符）
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey.shade400,
+                      width: 2,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade50,
+                  ),
+                  child: const Text(
+                    '?',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
 
-            // 视觉分隔
-            const SizedBox(height: 24),
-            const Divider(),
-            const SizedBox(height: 24),
+            const Spacer(flex: 1), // 中间留白
+
+            Text(
+              "请选择正确的部分来完成等式",
+              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 20),
 
             // 选项区域 - 使用Expanded填充剩余空间
             Expanded(
+              flex: 8, // 分配更多空间给选项
               child: SingleChildScrollView(
                 child: Column(
                   children: widget.exercise.options.asMap().entries.map((

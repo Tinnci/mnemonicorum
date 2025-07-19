@@ -159,14 +159,12 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 使用 spaceEvenly 分配空间
         children: [
-          // Display the formula with blanks
+          // 问题区域：带空白的公式
           _buildFormulaWithBlanks(),
 
-          const SizedBox(height: 30),
-
-          // Display the options
+          // 选项区域：拼图块设计
           _buildOptions(),
         ],
       ),
@@ -268,33 +266,43 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
           widget.showFeedback && selectedOptionId != widget.correctAnswerId;
 
       // Apply appropriate styling based on correctness
-      Color borderColor = Colors.blue;
+      Color borderColor = Theme.of(context).colorScheme.primary;
+      Color backgroundColor = Theme.of(
+        context,
+      ).colorScheme.primary.withAlpha(26);
+
       if (isCorrect) {
         borderColor = Colors.green;
+        backgroundColor = Colors.green.withAlpha(26);
       } else if (isIncorrect) {
-        borderColor = Colors.red;
+        borderColor = Theme.of(context).colorScheme.error;
+        backgroundColor = Theme.of(context).colorScheme.error.withAlpha(26);
       }
 
-      // Display the selected option
+      // Display the selected option with improved styling
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           border: Border.all(color: borderColor, width: 2),
-          borderRadius: BorderRadius.circular(8),
-          color: isCorrect
-              ? Colors.green.withAlpha(26)
-              : isIncorrect
-              ? Colors.red.withAlpha(26)
-              : Colors.blue.withAlpha(26),
+          borderRadius: BorderRadius.circular(10),
+          color: backgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: borderColor.withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: FormulaRenderer(
           latexExpression: selectedOption.latexExpression,
           semanticDescription: selectedOption.textLabel,
+          fontSize: 24,
         ),
       );
     } else {
-      // Display an empty blank space
+      // Display an improved blank space with "挖空"式设计
       return GestureDetector(
         onTap: () {
           if (!widget.showFeedback) {
@@ -309,111 +317,150 @@ class _CompletionExerciseWidgetState extends State<CompletionExerciseWidget> {
           decoration: BoxDecoration(
             border: Border.all(
               color: _selectedBlankId == blankComponent.id
-                  ? Colors.blue
-                  : Colors.grey,
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey.shade400,
               width: 2,
+              style: BorderStyle.solid,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             color: _selectedBlankId == blankComponent.id
-                ? Colors.blue.withAlpha(26)
-                : null,
+                ? Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withOpacity(0.3)
+                : Colors.grey.shade50,
           ),
-          child: const Text('?', style: TextStyle(fontSize: 24)),
+          child: Text(
+            '?',
+            style: TextStyle(
+              fontSize: 24,
+              color: _selectedBlankId == blankComponent.id
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       );
     }
   }
 
   Widget _buildOptions() {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      alignment: WrapAlignment.center,
-      children: widget.exercise.options.asMap().entries.map((entry) {
-        final int index = entry.key;
-        final option = entry.value;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        alignment: WrapAlignment.center,
+        children: widget.exercise.options.asMap().entries.map((entry) {
+          final int index = entry.key;
+          final option = entry.value;
 
-        // Check if this option is already used in a blank
-        final bool isUsed =
-            _filledBlanks.containsValue(option.id) ||
-            widget.selectedOptionId == option.id;
-        final bool isFocused =
-            _focusedOptionIndex == index && !widget.showFeedback;
+          // Check if this option is already used in a blank
+          final bool isUsed =
+              _filledBlanks.containsValue(option.id) ||
+              widget.selectedOptionId == option.id;
+          final bool isFocused =
+              _focusedOptionIndex == index && !widget.showFeedback;
 
-        // Determine if the answer is correct (only when showing feedback)
-        final bool isCorrect =
-            widget.showFeedback && option.id == widget.correctAnswerId;
-        final bool isIncorrect =
-            widget.showFeedback &&
-            widget.selectedOptionId == option.id &&
-            option.id != widget.correctAnswerId;
+          // Determine if the answer is correct (only when showing feedback)
+          final bool isCorrect =
+              widget.showFeedback && option.id == widget.correctAnswerId;
+          final bool isIncorrect =
+              widget.showFeedback &&
+              widget.selectedOptionId == option.id &&
+              option.id != widget.correctAnswerId;
 
-        // Apply appropriate styling based on correctness and selection
-        Color borderColor = Colors.grey;
-        if (isCorrect) {
-          borderColor = Colors.green;
-        } else if (isIncorrect) {
-          borderColor = Colors.red;
-        } else if (isFocused) {
-          borderColor = Colors.orange;
-        }
+          // Apply appropriate styling based on correctness and selection
+          Color borderColor = Colors.grey.shade300;
+          Color backgroundColor = Colors.transparent;
 
-        return GestureDetector(
-          onTap: () {
-            if (!widget.showFeedback && _selectedBlankId != null && !isUsed) {
-              // Fill the selected blank with this option
-              setState(() {
-                _filledBlanks[_selectedBlankId!] = option.id;
-                _selectedBlankId = null;
-              });
+          if (isCorrect) {
+            borderColor = Colors.green;
+            backgroundColor = Colors.green.withAlpha(26);
+          } else if (isIncorrect) {
+            borderColor = Theme.of(context).colorScheme.error;
+            backgroundColor = Theme.of(context).colorScheme.error.withAlpha(26);
+          } else if (isFocused) {
+            borderColor = Colors.orange;
+            backgroundColor = Colors.orange.withAlpha(26);
+          }
 
-              // Notify parent about the selection
-              widget.onOptionSelected(option.id);
-            }
-          },
-          child: Opacity(
-            opacity: isUsed && !widget.showFeedback ? 0.5 : 1.0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: borderColor, width: 2),
-                borderRadius: BorderRadius.circular(8),
-                color: isCorrect
-                    ? Colors.green.withAlpha(26)
-                    : isIncorrect
-                    ? Colors.red.withAlpha(26)
-                    : isFocused
-                    ? Colors.orange.withAlpha(26)
-                    : null,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!widget.showFeedback && !isUsed)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Text(
-                        '${index + 1}.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: isFocused
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          color: Colors.grey[600],
+          return Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: InkWell(
+              onTap: () {
+                if (!widget.showFeedback &&
+                    _selectedBlankId != null &&
+                    !isUsed) {
+                  // Fill the selected blank with this option
+                  setState(() {
+                    _filledBlanks[_selectedBlankId!] = option.id;
+                    _selectedBlankId = null;
+                  });
+
+                  // Notify parent about the selection
+                  widget.onOptionSelected(option.id);
+                }
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: borderColor, width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                  color: backgroundColor,
+                ),
+                child: Opacity(
+                  opacity: isUsed && !widget.showFeedback ? 0.5 : 1.0,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!widget.showFeedback && !isUsed)
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: isFocused
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isFocused
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                                color: isFocused
+                                    ? Colors.white
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                          ),
                         ),
+                      if (!widget.showFeedback && !isUsed)
+                        const SizedBox(width: 12),
+                      FormulaRenderer(
+                        latexExpression: option.latexExpression,
+                        semanticDescription: option.textLabel,
+                        fontSize: 22,
                       ),
-                    ),
-                  FormulaRenderer(
-                    latexExpression: option.latexExpression,
-                    semanticDescription: option.textLabel,
-                    fontSize: 20,
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

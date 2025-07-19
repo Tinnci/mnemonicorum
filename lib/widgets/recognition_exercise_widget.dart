@@ -98,22 +98,25 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Display the complete formula
+          // 改进后的公式展示区域 - 强化"主角"地位
           _buildFormulaDisplay(),
 
-          const SizedBox(height: 30),
-
-          // Question prompt
-          const Text(
-            'What is this formula called?',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          const SizedBox(height: 16), // 缩小间距
+          // 改进后的引导文字 - 弱化辅助说明
+          Text(
+            '这是什么公式?',
+            style: TextStyle(
+              fontSize: 16, // 调小字号
+              color: Colors.grey[600], // 使用更柔和的颜色
+              fontWeight: FontWeight.normal, // 取消加粗
+            ),
             textAlign: TextAlign.center,
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          // Display the name options
-          _buildNameOptions(),
+          // 将选项包裹在 Expanded 中，使其填充可用空间
+          Expanded(child: SingleChildScrollView(child: _buildNameOptions())),
 
           // Display explanation if showing feedback and answer is incorrect
           if (widget.showFeedback &&
@@ -126,18 +129,18 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
   }
 
   Widget _buildFormulaDisplay() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: FormulaRenderer(
-            latexExpression: widget.exercise.formula.latexExpression,
-            semanticDescription: widget.exercise.formula.semanticDescription,
-            fontSize: 28,
-          ),
+    return Card(
+      elevation: 6, // 增加阴影，使其更突出
+      margin: const EdgeInsets.all(24.0), // 增加外边距
+      // 使用主题颜色，更好地适配深色/浅色模式
+      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(32.0), // 增加内边距，提供更多呼吸空间
+        child: FormulaRenderer(
+          latexExpression: widget.exercise.formula.latexExpression,
+          semanticDescription: widget.exercise.formula.semanticDescription,
+          fontSize: 32, // 增大公式字号，强化焦点
         ),
       ),
     );
@@ -156,64 +159,97 @@ class _RecognitionExerciseWidgetState extends State<RecognitionExerciseWidget> {
         final bool isIncorrect =
             widget.showFeedback && isSelected && !isCorrect;
 
+        // 使用主题颜色
         Color? borderColor;
+        Color? backgroundColor;
+
         if (isCorrect) {
           borderColor = Colors.green;
+          backgroundColor = Colors.green.withAlpha(26);
         } else if (isIncorrect) {
-          borderColor = Colors.red;
+          borderColor = Theme.of(context).colorScheme.error;
+          backgroundColor = Theme.of(context).colorScheme.error.withAlpha(26);
         } else if (isSelected) {
-          borderColor = Colors.blue;
+          borderColor = Theme.of(context).colorScheme.primary;
+          backgroundColor = Theme.of(context).colorScheme.primary.withAlpha(26);
         } else if (isFocused) {
           borderColor = Colors.orange;
+          backgroundColor = Colors.orange.withAlpha(26);
         }
 
-        return GestureDetector(
-          onTap: widget.showFeedback
-              ? null
-              : () => widget.onOptionSelected(option.id),
-          child: Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: borderColor ?? Colors.grey, width: 2),
-              borderRadius: BorderRadius.circular(10),
-              color: isSelected && !widget.showFeedback
-                  ? Colors.blue.withAlpha(26)
-                  : isCorrect
-                  ? Colors.green.withAlpha(26)
-                  : isIncorrect
-                  ? Colors.red.withAlpha(26)
-                  : isFocused
-                  ? Colors.orange.withAlpha(26)
-                  : null,
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: borderColor ?? Colors.grey.shade300,
+              width: 2,
             ),
-            child: Row(
-              children: [
-                if (!widget.showFeedback)
-                  Text(
-                    '${index + 1}. ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: isFocused
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: Colors.grey[600],
+            borderRadius: BorderRadius.circular(12),
+            color: backgroundColor,
+            boxShadow: isSelected || isFocused
+                ? [
+                    BoxShadow(
+                      color: (borderColor ?? Colors.grey).withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                Expanded(
-                  child: Text(
-                    option.textLabel,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: isSelected || isCorrect || isFocused
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                  ]
+                : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: widget.showFeedback
+                  ? null
+                  : () => widget.onOptionSelected(option.id),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    if (!widget.showFeedback)
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: isFocused
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: isFocused
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: isFocused
+                                  ? Colors.white
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!widget.showFeedback) const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        option.textLabel,
+                        style: TextStyle(
+                          fontSize: 18, // 保持适中的字号
+                          fontWeight: isSelected || isCorrect || isFocused
+                              ? FontWeight
+                                    .w600 // 使用 w600 (semi-bold) 替代 w700 (bold)
+                              : FontWeight.normal,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
