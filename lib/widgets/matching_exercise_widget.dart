@@ -89,6 +89,54 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
     }
   }
 
+  /// Get appropriate relation symbol based on formula type
+  String _getRelationSymbol() {
+    final formula = widget.exercise.formula;
+
+    // Check if the original formula contains an equals sign
+    if (formula.latexExpression.contains('=')) {
+      return '=';
+    }
+
+    // For trigonometric identities and equations
+    if (formula.category == 'trigonometry' &&
+        (formula.subcategory == 'identities' ||
+            formula.tags.contains('identity'))) {
+      return '=';
+    }
+
+    // For calculus formulas (derivatives, integrals, series)
+    if (formula.category == 'calculus') {
+      if (formula.subcategory == 'integration' ||
+          formula.subcategory == 'series') {
+        return '=';
+      }
+      // For approximations or limits
+      if (formula.tags.contains('approximation') ||
+          formula.tags.contains('limit')) {
+        return '\\approx';
+      }
+    }
+
+    // For physics formulas
+    if (formula.category == 'physics') {
+      return '=';
+    }
+
+    // For algebraic expressions that might be equivalences
+    if (formula.category == 'algebra') {
+      if (formula.tags.contains('identity') ||
+          formula.tags.contains('equation')) {
+        return '=';
+      }
+      // For factorizations or transformations
+      return '\\equiv';
+    }
+
+    // Default to equals for most mathematical relationships
+    return '=';
+  }
+
   @override
   Widget build(BuildContext context) {
     final questionFormulaComponent = widget.exercise.formula.components
@@ -100,11 +148,28 @@ class _MatchingExerciseWidgetState extends State<MatchingExerciseWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Question: Display the left side or a component of the formula
-          FormulaRenderer(
-            latexExpression: questionFormulaComponent.latexPart,
-            semanticDescription: questionFormulaComponent.description,
-            fontSize: 30,
+          // Question: Display the left side with appropriate relation symbol
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FormulaRenderer(
+                latexExpression: questionFormulaComponent.latexPart,
+                semanticDescription: questionFormulaComponent.description,
+                fontSize: 30,
+              ),
+              const SizedBox(width: 16),
+              // Add appropriate relation symbol
+              FormulaRenderer(
+                latexExpression: _getRelationSymbol(),
+                semanticDescription: "等于",
+                fontSize: 30,
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                '?',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
           const SizedBox(height: 40),
           // Options

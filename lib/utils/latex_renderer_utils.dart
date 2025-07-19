@@ -36,53 +36,14 @@ class LatexRendererUtils {
     required Color textColor,
     required String semanticDescription,
   }) {
-    // Create a cache key based on the formula and styling
-    final cacheKey = '${latexExpression}_${fontSize}_${textColor.toARGB32()}';
-
-    // Return cached widget if available and update access time
-    if (_formulaCache.containsKey(cacheKey)) {
-      _cacheAccessTimes[cacheKey] = DateTime.now();
-      return _formulaCache[cacheKey]!;
-    }
-
-    // Create new widget
-    final widget = _createFormulaWidget(
+    // Don't cache widgets to avoid GlobalKey conflicts
+    // Instead, always create a new widget but with optimized LaTeX processing
+    return _createFormulaWidget(
       latexExpression: latexExpression,
       fontSize: fontSize,
       textColor: textColor,
       semanticDescription: semanticDescription,
     );
-
-    // Manage cache size using LRU eviction
-    if (_formulaCache.length >= _maxCacheSize) {
-      _evictLeastRecentlyUsed();
-    }
-
-    // Cache the new widget with access time
-    _formulaCache[cacheKey] = widget;
-    _cacheAccessTimes[cacheKey] = DateTime.now();
-
-    return widget;
-  }
-
-  /// Evict least recently used items from cache
-  static void _evictLeastRecentlyUsed() {
-    if (_cacheAccessTimes.isEmpty) return;
-
-    // Find the least recently used key
-    String oldestKey = _cacheAccessTimes.keys.first;
-    DateTime oldestTime = _cacheAccessTimes[oldestKey]!;
-
-    for (var entry in _cacheAccessTimes.entries) {
-      if (entry.value.isBefore(oldestTime)) {
-        oldestKey = entry.key;
-        oldestTime = entry.value;
-      }
-    }
-
-    // Remove the oldest entry
-    _formulaCache.remove(oldestKey);
-    _cacheAccessTimes.remove(oldestKey);
   }
 
   /// Create a formula widget with error handling
