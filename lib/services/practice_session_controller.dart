@@ -130,14 +130,20 @@ class PracticeSessionController extends ChangeNotifier {
     _selectedOptionId = optionId;
     _showFeedback = true;
 
-    if (currentExercise!.correctAnswerId == optionId) {
+    final bool isAnswerCorrect = currentExercise!.correctAnswerId == optionId;
+
+    if (isAnswerCorrect) {
       _correctAnswers++;
     } else {
       _incorrectAnswers++;
     }
+
+    // 传递更详细的信息
     _progressService.recordExerciseAttempt(
       currentExercise!.formula.id,
-      currentExercise!.correctAnswerId == optionId,
+      isAnswerCorrect,
+      selectedOptionId: optionId,
+      correctOptionId: currentExercise!.correctAnswerId,
     );
     notifyListeners();
   }

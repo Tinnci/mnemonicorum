@@ -548,6 +548,17 @@ class ExerciseGenerator {
       r'\\cos\b': '\\sin',
       r'\\tan\b': '\\cot',
       r'\\cot\b': '\\tan',
+      // 新增：更多易混淆的替换
+      r'\\sum': '\\prod', // 求和 vs. 求积
+      r'\\cup': '\\cap', // 并集 vs. 交集
+      r'\\int': '\\oint', // 积分 vs. 闭路积分
+      r'\\infty': '0', // 无穷 vs. 0
+      r'\\neq': '=', // 不等于 vs. 等于
+      r'\\approx': '=', // 约等于 vs. 等于
+      r'\\pm': '\\mp', // 加减 vs. 减加
+      r'\\equiv': '=', // 恒等于 vs. 等于
+      r'\\propto': '=', // 正比于 vs. 等于
+      r'\\sim': '=', // 相似于 vs. 等于
     };
 
     String result = latex;
@@ -596,10 +607,58 @@ class ExerciseGenerator {
           : s.contains('_1')
           ? s.replaceAll('_1', '_0')
           : s,
+      // 新增：修改系数
+      (String s) {
+        if (s.contains(r'\frac{1}{2}')) {
+          return s.replaceAll(r'\frac{1}{2}', r'\frac{1}{3}');
+        }
+        if (s.contains(r'\frac{1}{3}')) {
+          return s.replaceAll(r'\frac{1}{3}', r'\frac{1}{4}');
+        }
+        if (s.contains(r'\frac{1}{4}')) {
+          return s.replaceAll(r'\frac{1}{4}', r'\frac{1}{5}');
+        }
+        // 将第一个遇到的数字加1
+        return s.replaceFirstMapped(RegExp(r'(\d+)'), (match) {
+          return (int.parse(match.group(1)!) + 1).toString();
+        });
+      },
+      // 新增：修改积分/求和的上下限
+      (String s) {
+        if (s.contains(r'_{n=0}')) return s.replaceAll(r'_{n=0}', r'_{n=1}');
+        if (s.contains(r'^{\infty}')) {
+          return s.replaceAll(r'^{\infty}', r'^{N}');
+        }
+        if (s.contains(r'_{0}^{')) return s.replaceAll(r'_{0}^{', r'_{1}^{');
+        return s;
+      },
+      // 新增：修改三角函数参数
+      (String s) {
+        if (s.contains(r'\sin x')) return s.replaceAll(r'\sin x', r'\sin 2x');
+        if (s.contains(r'\cos x')) return s.replaceAll(r'\cos x', r'\cos 2x');
+        if (s.contains(r'\tan x')) return s.replaceAll(r'\tan x', r'\tan 2x');
+        return s;
+      },
+      // 新增：修改变量名
+      (String s) {
+        if (s.contains(r'\alpha')) return s.replaceAll(r'\alpha', r'\beta');
+        if (s.contains(r'\beta')) return s.replaceAll(r'\beta', r'\gamma');
+        if (s.contains(r'\gamma')) return s.replaceAll(r'\gamma', r'\delta');
+        return s;
+      },
     ];
 
     final modification = modifications[_random.nextInt(modifications.length)];
-    return modification(latex);
+
+    final modifiedLatex = modification(latex);
+
+    // 确保修改后的LaTeX仍然有效且与原始的不同
+    if (modifiedLatex != latex && _isValidLatex(modifiedLatex)) {
+      return modifiedLatex;
+    }
+
+    // 如果修改失败，返回原始的LaTeX
+    return latex;
   }
 
   /// Validate exercise quality to ensure it meets educational standards

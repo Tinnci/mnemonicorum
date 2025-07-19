@@ -18,12 +18,22 @@ class ProgressService extends ChangeNotifier {
         );
   }
 
-  Future<void> recordExerciseAttempt(String formulaId, bool isCorrect) async {
+  Future<void> recordExerciseAttempt(
+    String formulaId,
+    bool isCorrect, {
+    String? selectedOptionId,
+    String? correctOptionId,
+  }) async {
     final progress = getFormulaProgress(formulaId);
     progress.totalAttempts++;
     progress.lastPracticed = DateTime.now();
     progress.attempts.add(
-      ExerciseAttempt(timestamp: DateTime.now(), isCorrect: isCorrect),
+      ExerciseAttempt(
+        timestamp: DateTime.now(),
+        isCorrect: isCorrect,
+        selectedOptionId: selectedOptionId, // 保存选择的选项ID
+        correctOptionId: correctOptionId, // 保存正确的选项ID
+      ),
     );
 
     if (isCorrect) {
@@ -176,6 +186,37 @@ class ProgressService extends ChangeNotifier {
     }
 
     return streak;
+  }
+
+  /// Get commonly wrong options for a specific formula
+  List<String> getCommonlyWrongOptions(String formulaId, {int limit = 3}) {
+    final allProgress = getAllFormulaProgress();
+    final wrongAttempts = <String>[];
+
+    for (final progress in allProgress) {
+      // 找到与目标公式相关的错误尝试
+      if (progress.formulaId == formulaId) {
+        for (final attempt in progress.attempts) {
+          if (!attempt.isCorrect && attempt.selectedOptionId != null) {
+            wrongAttempts.add(attempt.selectedOptionId!);
+          }
+        }
+      }
+    }
+
+    if (wrongAttempts.isEmpty) return [];
+
+    // 计算每个错误选项的频率
+    final frequencyMap = <String, int>{};
+    for (final optionId in wrongAttempts) {
+      frequencyMap[optionId] = (frequencyMap[optionId] ?? 0) + 1;
+    }
+
+    // 按频率排序并返回最高频的几个
+    final sortedOptions = frequencyMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return sortedOptions.take(limit).map((e) => e.key).toList();
   }
 
   Future<void> clearAllProgress() async {

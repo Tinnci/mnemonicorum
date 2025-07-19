@@ -18,8 +18,17 @@ class ExerciseAttempt {
   final DateTime timestamp;
   @HiveField(1)
   final bool isCorrect;
+  @HiveField(2) // 新增字段
+  final String? selectedOptionId;
+  @HiveField(3) // 新增字段
+  final String? correctOptionId;
 
-  ExerciseAttempt({required this.timestamp, required this.isCorrect});
+  ExerciseAttempt({
+    required this.timestamp,
+    required this.isCorrect,
+    this.selectedOptionId, // 设为可选
+    this.correctOptionId, // 设为可选
+  });
 }
 
 @HiveType(typeId: 14)

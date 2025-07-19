@@ -409,6 +409,131 @@
         }
       ],
       "semanticDescription": "当x趋近于0时，x减arctanx等价于三分之一乘以x的三次方。"
+    },
+    {
+      "id": "fundamental_theorem_of_calculus",
+      "name": "微积分基本定理",
+      "latexExpression": "\\int_a^b f(x) \\, dx = F(b) - F(a)",
+      "category": "calculus",
+      "subcategory": "integration",
+      "difficulty": "medium",
+      "tags": ["calculus", "fundamental theorem", "integration"],
+      "description": "牛顿-莱布尼茨公式，连接微分和积分。",
+      "components": [
+        {
+          "id": "ftc_lhs",
+          "latexPart": "\\int_a^b f(x) \\, dx",
+          "type": "leftSide",
+          "description": "f(x)从a到b的定积分"
+        },
+        {
+          "id": "ftc_rhs",
+          "latexPart": "F(b) - F(a)",
+          "type": "rightSide",
+          "description": "原函数在b点与a点的差值"
+        }
+      ],
+      "semanticDescription": "函数f(x)从a到b的定积分等于其原函数F(x)在b点的值减去在a点的值。"
+    },
+    {
+      "id": "chain_rule",
+      "name": "链式法则",
+      "latexExpression": "\\frac{d}{dx}[f(g(x))] = f'(g(x)) \\cdot g'(x)",
+      "category": "calculus",
+      "subcategory": "differentiation",
+      "difficulty": "medium",
+      "tags": ["calculus", "chain rule", "differentiation"],
+      "description": "复合函数求导的链式法则。",
+      "components": [
+        {
+          "id": "chain_lhs",
+          "latexPart": "\\frac{d}{dx}[f(g(x))]",
+          "type": "leftSide",
+          "description": "f(g(x))对x的导数"
+        },
+        {
+          "id": "chain_rhs",
+          "latexPart": "f'(g(x)) \\cdot g'(x)",
+          "type": "rightSide",
+          "description": "f在g(x)处的导数乘以g在x处的导数"
+        }
+      ],
+      "semanticDescription": "复合函数f(g(x))的导数等于外函数f在g(x)处的导数乘以内函数g在x处的导数。"
+    },
+    {
+      "id": "product_rule",
+      "name": "乘积法则",
+      "latexExpression": "\\frac{d}{dx}[f(x)g(x)] = f'(x)g(x) + f(x)g'(x)",
+      "category": "calculus",
+      "subcategory": "differentiation",
+      "difficulty": "medium",
+      "tags": ["calculus", "product rule", "differentiation"],
+      "description": "两个函数乘积的求导法则。",
+      "components": [
+        {
+          "id": "product_lhs",
+          "latexPart": "\\frac{d}{dx}[f(x)g(x)]",
+          "type": "leftSide",
+          "description": "f(x)g(x)对x的导数"
+        },
+        {
+          "id": "product_rhs",
+          "latexPart": "f'(x)g(x) + f(x)g'(x)",
+          "type": "rightSide",
+          "description": "f的导数乘以g加上f乘以g的导数"
+        }
+      ],
+      "semanticDescription": "两个函数乘积的导数等于第一个函数的导数乘以第二个函数，再加上第一个函数乘以第二个函数的导数。"
+    },
+    {
+      "id": "quotient_rule",
+      "name": "商法则",
+      "latexExpression": "\\frac{d}{dx}\\left[\\frac{f(x)}{g(x)}\\right] = \\frac{f'(x)g(x) - f(x)g'(x)}{[g(x)]^2}",
+      "category": "calculus",
+      "subcategory": "differentiation",
+      "difficulty": "medium",
+      "tags": ["calculus", "quotient rule", "differentiation"],
+      "description": "两个函数商的求导法则。",
+      "components": [
+        {
+          "id": "quotient_lhs",
+          "latexPart": "\\frac{d}{dx}\\left[\\frac{f(x)}{g(x)}\\right]",
+          "type": "leftSide",
+          "description": "f(x)/g(x)对x的导数"
+        },
+        {
+          "id": "quotient_rhs",
+          "latexPart": "\\frac{f'(x)g(x) - f(x)g'(x)}{[g(x)]^2}",
+          "type": "rightSide",
+          "description": "分子是f的导数乘以g减去f乘以g的导数，分母是g的平方"
+        }
+      ],
+      "semanticDescription": "两个函数商的导数等于分子的导数乘以分母减去分子乘以分母的导数，再除以分母的平方。"
+    },
+    {
+      "id": "substitution_rule",
+      "name": "换元积分法",
+      "latexExpression": "\\int f(g(x))g'(x) \\, dx = \\int f(u) \\, du",
+      "category": "calculus",
+      "subcategory": "integration",
+      "difficulty": "hard",
+      "tags": ["calculus", "substitution", "integration"],
+      "description": "积分中的换元法，设u=g(x)。",
+      "components": [
+        {
+          "id": "substitution_lhs",
+          "latexPart": "\\int f(g(x))g'(x) \\, dx",
+          "type": "leftSide",
+          "description": "f(g(x))乘以g'(x)的积分"
+        },
+        {
+          "id": "substitution_rhs",
+          "latexPart": "\\int f(u) \\, du",
+          "type": "rightSide",
+          "description": "f(u)对u的积分"
+        }
+      ],
+      "semanticDescription": "当设u=g(x)时，f(g(x))g'(x)的积分等于f(u)对u的积分。"
     }
   ]
 }

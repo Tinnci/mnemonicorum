@@ -19,17 +19,23 @@ class ExerciseAttemptAdapter extends TypeAdapter<ExerciseAttempt> {
     return ExerciseAttempt(
       timestamp: fields[0] as DateTime,
       isCorrect: fields[1] as bool,
+      selectedOptionId: fields[2] as String?,
+      correctOptionId: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ExerciseAttempt obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.timestamp)
       ..writeByte(1)
-      ..write(obj.isCorrect);
+      ..write(obj.isCorrect)
+      ..writeByte(2)
+      ..write(obj.selectedOptionId)
+      ..writeByte(3)
+      ..write(obj.correctOptionId);
   }
 
   @override
