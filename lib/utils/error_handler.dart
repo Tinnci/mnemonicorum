@@ -321,17 +321,27 @@ class ErrorHandler {
 
       if (braceCount != 0) return false;
 
-      // Check for common malformed patterns
+      // Check for common malformed patterns - be more specific to avoid false positives
       final invalidPatterns = [
-        r'\\inf[^t]', // \inf not followed by 't'
-        r'\\fr[^a]', // \fr not followed by 'a'
-        r'\\su[^m]', // \su not followed by 'm'
-        r'\\in[^t]', // \in not followed by 't'
-        r'\\lim[^i]', // \lim not followed by 'i'
+        r'\\inf[^t][^y]', // \inf not followed by 'ty' (should be \infty)
+        r'\\fr[^a][^c]', // \fr not followed by 'ac' (should be \frac)
+        r'\\su[^m][^m]', // \su not followed by 'mm' (should be \sum)
+        r'\\in[^t][^e]', // \in not followed by 'te' (should be \int)
+        r'\\lim[^i][^t]', // \lim not followed by 'it' (should be \lim)
       ];
 
       for (final pattern in invalidPatterns) {
         if (RegExp(pattern).hasMatch(latex)) {
+          return false;
+        }
+      }
+
+      // Additional checks for common LaTeX syntax
+      // Check for unmatched backslashes (except at the end)
+      if (latex.contains('\\') && !latex.endsWith('\\')) {
+        // Check if there are any backslashes not followed by a letter or special character
+        final backslashPattern = RegExp(r'\\[^a-zA-Z\\\{\}\[\]\(\)\^_\{\}]');
+        if (backslashPattern.hasMatch(latex)) {
           return false;
         }
       }

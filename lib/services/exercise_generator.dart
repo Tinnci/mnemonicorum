@@ -74,6 +74,36 @@ class ExerciseGenerator {
       }
     }
 
+    // If we still don't have enough distractors, create generic ones
+    while (distractors.length < 3) {
+      final genericNames = [
+        '相关公式',
+        '类似表达式',
+        '其他公式',
+        '数学公式',
+        '表达式',
+        '等式',
+        '恒等式',
+        '定理',
+      ];
+
+      final genericName = genericNames[_random.nextInt(genericNames.length)];
+      final uniqueId =
+          'generic_${DateTime.now().microsecondsSinceEpoch}_${distractors.length}';
+
+      if (!usedNames.contains(genericName)) {
+        usedNames.add(genericName);
+        distractors.add(
+          ExerciseOption(
+            id: uniqueId,
+            latexExpression: '',
+            textLabel: genericName,
+            isCorrect: false,
+          ),
+        );
+      }
+    }
+
     final options = [correctOption, ...distractors];
     options.shuffle(_random);
 
@@ -266,7 +296,40 @@ class ExerciseGenerator {
             ),
           );
         } else {
-          break; // Avoid infinite loop
+          // Final fallback: create generic distractors
+          final genericLatex = [
+            'x',
+            'y',
+            'z',
+            'a',
+            'b',
+            'c',
+            '1',
+            '0',
+            '\\alpha',
+            '\\beta',
+            '\\gamma',
+            '\\theta',
+          ];
+
+          final genericLatexExpr =
+              genericLatex[_random.nextInt(genericLatex.length)];
+          final uniqueId =
+              'generic_${DateTime.now().microsecondsSinceEpoch}_${distractors.length}';
+
+          if (!usedLatex.contains(genericLatexExpr)) {
+            usedLatex.add(genericLatexExpr);
+            distractors.add(
+              ExerciseOption(
+                id: uniqueId,
+                latexExpression: genericLatexExpr,
+                textLabel: '通用表达式',
+                isCorrect: false,
+              ),
+            );
+          } else {
+            break; // Avoid infinite loop
+          }
         }
       }
     }
@@ -355,7 +418,46 @@ class ExerciseGenerator {
           ),
         );
       } else {
-        break; // Avoid infinite loop
+        // Final fallback: create generic distractors
+        final genericLatex = [
+          'x',
+          'y',
+          'z',
+          'a',
+          'b',
+          'c',
+          '1',
+          '0',
+          '\\alpha',
+          '\\beta',
+          '\\gamma',
+          '\\theta',
+          '\\sin x',
+          '\\cos x',
+          '\\tan x',
+          '\\frac{1}{2}',
+          '\\frac{1}{3}',
+          '\\frac{1}{4}',
+        ];
+
+        final genericLatexExpr =
+            genericLatex[_random.nextInt(genericLatex.length)];
+        final uniqueId =
+            'generic_${DateTime.now().microsecondsSinceEpoch}_${distractors.length}';
+
+        if (!usedLatex.contains(genericLatexExpr)) {
+          usedLatex.add(genericLatexExpr);
+          distractors.add(
+            ExerciseOption(
+              id: uniqueId,
+              latexExpression: genericLatexExpr,
+              textLabel: '通用表达式',
+              isCorrect: false,
+            ),
+          );
+        } else {
+          break; // Avoid infinite loop
+        }
       }
     }
 
@@ -405,13 +507,13 @@ class ExerciseGenerator {
 
   /// Validate LaTeX expression for basic syntax correctness
   bool _isValidLatex(String latex) {
-    // Check for common LaTeX command integrity
+    // Check for common LaTeX command integrity - be more specific to avoid false positives
     final invalidPatterns = [
-      r'\\inf[^t]', // \inf not followed by 't' (should be \infty)
-      r'\\fr[^a]', // \fr not followed by 'a' (should be \frac)
-      r'\\su[^m]', // \su not followed by 'm' (should be \sum)
-      r'\\in[^t]', // \in not followed by 't' (should be \int)
-      r'\\lim[^i]', // \lim not followed by 'i' (should be \lim)
+      r'\\inf[^t][^y]', // \inf not followed by 'ty' (should be \infty)
+      r'\\fr[^a][^c]', // \fr not followed by 'ac' (should be \frac)
+      r'\\su[^m][^m]', // \su not followed by 'mm' (should be \sum)
+      r'\\in[^t][^e]', // \in not followed by 'te' (should be \int)
+      r'\\lim[^i][^t]', // \lim not followed by 'it' (should be \lim)
     ];
 
     for (final pattern in invalidPatterns) {
@@ -428,7 +530,19 @@ class ExerciseGenerator {
       if (braceCount < 0) return false; // More closing than opening
     }
 
-    return braceCount == 0; // Should be balanced
+    if (braceCount != 0) return false; // Should be balanced
+
+    // Additional checks for common LaTeX syntax
+    // Check for unmatched backslashes (except at the end)
+    if (latex.contains('\\') && !latex.endsWith('\\')) {
+      // Check if there are any backslashes not followed by a letter or special character
+      final backslashPattern = RegExp(r'\\[^a-zA-Z\\\{\}\[\]\(\)\^_\{\}]');
+      if (backslashPattern.hasMatch(latex)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /// Apply minor modifications to create plausible distractors
