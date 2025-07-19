@@ -49,6 +49,366 @@
         }
       ],
       "semanticDescription": "u乘dv的积分等于uv减去v乘du的积分。"
+    },
+    {
+      "id": "sinx_taylor",
+      "name": "sinx的泰勒公式",
+      "latexExpression": "\\sin x = x - \\frac{x^3}{3!} + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "easy",
+      "tags": [
+        "taylor",
+        "series",
+        "sine",
+        "maclaurin"
+      ],
+      "description": "正弦函数 sinx 在 x=0 处的泰勒展开式（麦克劳林公式），常用于计算极限和近似值。",
+      "components": [
+        {
+          "id": "sinx_taylor_lhs",
+          "latexPart": "\\sin x",
+          "type": "leftSide",
+          "description": "sinx"
+        },
+        {
+          "id": "sinx_taylor_rhs",
+          "latexPart": "x - \\frac{x^3}{3!} + o(x^3)",
+          "type": "rightSide",
+          "description": "x减去x的3次方除以3的阶乘，加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，sinx约等于x减去x的3次方除以6。"
+    },
+    {
+      "id": "cosx_taylor",
+      "name": "cosx的泰勒公式",
+      "latexExpression": "\\cos x = 1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} + o(x^4)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "easy",
+      "tags": [
+        "taylor",
+        "series",
+        "cosine",
+        "maclaurin"
+      ],
+      "description": "余弦函数 cosx 在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "cosx_taylor_lhs",
+          "latexPart": "\\cos x",
+          "type": "leftSide",
+          "description": "cosx"
+        },
+        {
+          "id": "cosx_taylor_rhs",
+          "latexPart": "1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} + o(x^4)",
+          "type": "rightSide",
+          "description": "1减去x的2次方除以2的阶乘，加上x的4次方除以4的阶乘，再加上x的4次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，cosx约等于1减去x的平方除以2，再加上x的4次方除以24。"
+    },
+    {
+      "id": "arcsinx_taylor",
+      "name": "arcsinx的泰勒公式",
+      "latexExpression": "\\arcsin x = x + \\frac{1}{6}x^3 + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "medium",
+      "tags": [
+        "taylor",
+        "series",
+        "arcsin",
+        "maclaurin"
+      ],
+      "description": "反正弦函数 arcsinx 在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "arcsinx_taylor_lhs",
+          "latexPart": "\\arcsin x",
+          "type": "leftSide",
+          "description": "arcsinx"
+        },
+        {
+          "id": "arcsinx_taylor_rhs",
+          "latexPart": "x + \\frac{1}{6}x^3 + o(x^3)",
+          "type": "rightSide",
+          "description": "x加上六分之一x的3次方，再加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，arcsinx约等于x加上六分之一乘以x的3次方。"
+    },
+    {
+      "id": "tanx_taylor",
+      "name": "tanx的泰勒公式",
+      "latexExpression": "\\tan x = x + \\frac{x^3}{3} + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "medium",
+      "tags": [
+        "taylor",
+        "series",
+        "tan",
+        "maclaurin"
+      ],
+      "description": "正切函数 tanx 在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "tanx_taylor_lhs",
+          "latexPart": "\\tan x",
+          "type": "leftSide",
+          "description": "tanx"
+        },
+        {
+          "id": "tanx_taylor_rhs",
+          "latexPart": "x + \\frac{x^3}{3} + o(x^3)",
+          "type": "rightSide",
+          "description": "x加上x的3次方除以3，再加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，tanx约等于x加上三分之一乘以x的3次方。"
+    },
+    {
+      "id": "arctanx_taylor",
+      "name": "arctanx的泰勒公式",
+      "latexExpression": "\\arctan x = x - \\frac{x^3}{3} + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "medium",
+      "tags": [
+        "taylor",
+        "series",
+        "arctan",
+        "maclaurin"
+      ],
+      "description": "反正切函数 arctanx 在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "arctanx_taylor_lhs",
+          "latexPart": "\\arctan x",
+          "type": "leftSide",
+          "description": "arctanx"
+        },
+        {
+          "id": "arctanx_taylor_rhs",
+          "latexPart": "x - \\frac{x^3}{3} + o(x^3)",
+          "type": "rightSide",
+          "description": "x减去x的3次方除以3，再加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，arctanx约等于x减去三分之一乘以x的3次方。"
+    },
+    {
+      "id": "ln1plusx_taylor",
+      "name": "ln(1+x)的泰勒公式",
+      "latexExpression": "\\ln(1+x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "easy",
+      "tags": [
+        "taylor",
+        "series",
+        "logarithm",
+        "maclaurin"
+      ],
+      "description": "对数函数 ln(1+x) 在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "ln1plusx_taylor_lhs",
+          "latexPart": "\\ln(1+x)",
+          "type": "leftSide",
+          "description": "ln(1+x)"
+        },
+        {
+          "id": "ln1plusx_taylor_rhs",
+          "latexPart": "x - \\frac{x^2}{2} + \\frac{x^3}{3} + o(x^3)",
+          "type": "rightSide",
+          "description": "x减去x的平方除以2，加上x的立方除以3，再加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，ln(1+x)约等于x减去二分之一x的平方加上三分之一x的立方。"
+    },
+    {
+      "id": "ex_taylor_extended",
+      "name": "e^x的泰勒公式（展开式）",
+      "latexExpression": "e^x = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + o(x^3)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "easy",
+      "tags": [
+        "taylor",
+        "series",
+        "e",
+        "maclaurin"
+      ],
+      "description": "指数函数 e^x 在 x=0 处的泰勒展开式（麦克劳林公式），是 e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} 的前几项。",
+      "components": [
+        {
+          "id": "ex_taylor_ext_lhs",
+          "latexPart": "e^x",
+          "type": "leftSide",
+          "description": "e的x次幂"
+        },
+        {
+          "id": "ex_taylor_ext_rhs",
+          "latexPart": "1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + o(x^3)",
+          "type": "rightSide",
+          "description": "1加x，加上x的平方除以2的阶乘，加上x的立方除以3的阶乘，再加上x的3次方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，e的x次幂约等于1加x加二分之一x的平方加六分之一x的立方。"
+    },
+    {
+      "id": "1plusx_alpha_taylor",
+      "name": "(1+x)α次幂的泰勒公式",
+      "latexExpression": "(1+x)^\\alpha = 1 + \\alpha x + \\frac{\\alpha(\\alpha-1)}{2!}x^2 + o(x^2)",
+      "category": "calculus",
+      "subcategory": "series",
+      "difficulty": "medium",
+      "tags": [
+        "taylor",
+        "series",
+        "binomial",
+        "maclaurin"
+      ],
+      "description": "二项式级数 (1+x) 的 alpha 次幂在 x=0 处的泰勒展开式（麦克劳林公式）。",
+      "components": [
+        {
+          "id": "1plusx_alpha_lhs",
+          "latexPart": "(1+x)^\\alpha",
+          "type": "leftSide",
+          "description": "(1+x)的α次幂"
+        },
+        {
+          "id": "1plusx_alpha_rhs",
+          "latexPart": "1 + \\alpha x + \\frac{\\alpha(\\alpha-1)}{2!}x^2 + o(x^2)",
+          "type": "rightSide",
+          "description": "1加上αx，加上α乘以(α-1)除以2的阶乘再乘以x的平方，再加上x的平方的高阶无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，1加x的α次幂约等于1加αx，加上二分之一α乘以α减1再乘以x的平方。"
+    },
+    {
+      "id": "x_minus_sinx_infinitesimal",
+      "name": "x-sinx的等价无穷小",
+      "latexExpression": "x - \\sin x \\sim \\frac{1}{6}x^3 \\quad (x \\to 0)",
+      "category": "calculus",
+      "subcategory": "infinitesimal",
+      "difficulty": "medium",
+      "tags": [
+        "infinitesimal",
+        "equivalent",
+        "taylor",
+        "sine"
+      ],
+      "description": "由sinx的泰勒公式推导出的常用等价无穷小代换。可推广：若g(x)→0, 则 g(x) - sin(g(x)) ~ (1/6)g(x)³。",
+      "components": [
+        {
+          "id": "x_minus_sinx_lhs",
+          "latexPart": "x - \\sin x",
+          "type": "leftSide",
+          "description": "差函数x-sinx"
+        },
+        {
+          "id": "x_minus_sinx_rhs",
+          "latexPart": "\\frac{1}{6}x^3",
+          "type": "rightSide",
+          "description": "等价无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，x减sinx等价于六分之一乘以x的三次方。"
+    },
+    {
+      "id": "tanx_minus_x_infinitesimal",
+      "name": "tanx-x的等价无穷小",
+      "latexExpression": "\\tan x - x \\sim \\frac{1}{3}x^3 \\quad (x \\to 0)",
+      "category": "calculus",
+      "subcategory": "infinitesimal",
+      "difficulty": "medium",
+      "tags": [
+        "infinitesimal",
+        "equivalent",
+        "taylor",
+        "tan"
+      ],
+      "description": "由tanx的泰勒公式推导出的常用等价无穷小代换。",
+      "components": [
+        {
+          "id": "tanx_minus_x_lhs",
+          "latexPart": "\\tan x - x",
+          "type": "leftSide",
+          "description": "差函数tanx-x"
+        },
+        {
+          "id": "tanx_minus_x_rhs",
+          "latexPart": "\\frac{1}{3}x^3",
+          "type": "rightSide",
+          "description": "等价无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，tanx减x等价于三分之一乘以x的三次方。"
+    },
+    {
+      "id": "arcsinx_minus_x_infinitesimal",
+      "name": "arcsinx-x的等价无穷小",
+      "latexExpression": "\\arcsin x - x \\sim \\frac{1}{6}x^3 \\quad (x \\to 0)",
+      "category": "calculus",
+      "subcategory": "infinitesimal",
+      "difficulty": "medium",
+      "tags": [
+        "infinitesimal",
+        "equivalent",
+        "taylor",
+        "arcsin"
+      ],
+      "description": "由arcsinx的泰勒公式推导出的常用等价无穷小代换。",
+      "components": [
+        {
+          "id": "arcsinx_minus_x_lhs",
+          "latexPart": "\\arcsin x - x",
+          "type": "leftSide",
+          "description": "差函数arcsinx-x"
+        },
+        {
+          "id": "arcsinx_minus_x_rhs",
+          "latexPart": "\\frac{1}{6}x^3",
+          "type": "rightSide",
+          "description": "等价无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，arcsinx减x等价于六分之一乘以x的三次方。"
+    },
+    {
+      "id": "x_minus_arctanx_infinitesimal",
+      "name": "x-arctanx的等价无穷小",
+      "latexExpression": "x - \\arctan x \\sim \\frac{1}{3}x^3 \\quad (x \\to 0)",
+      "category": "calculus",
+      "subcategory": "infinitesimal",
+      "difficulty": "medium",
+      "tags": [
+        "infinitesimal",
+        "equivalent",
+        "taylor",
+        "arctan"
+      ],
+      "description": "由arctanx的泰勒公式推导出的常用等价无穷小代换。",
+      "components": [
+        {
+          "id": "x_minus_arctanx_lhs",
+          "latexPart": "x - \\arctan x",
+          "type": "leftSide",
+          "description": "差函数x-arctanx"
+        },
+        {
+          "id": "x_minus_arctanx_rhs",
+          "latexPart": "\\frac{1}{3}x^3",
+          "type": "rightSide",
+          "description": "等价无穷小"
+        }
+      ],
+      "semanticDescription": "当x趋近于0时，x减arctanx等价于三分之一乘以x的三次方。"
     }
   ]
 }
