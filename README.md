@@ -57,7 +57,7 @@ A modern, interactive Flutter application designed to help students master mathe
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/mnemonicorum.git
+   git clone https://github.com/tinnci/mnemonicorum.git
    cd mnemonicorum
    ```
 
