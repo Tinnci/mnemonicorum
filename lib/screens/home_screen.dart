@@ -2,14 +2,78 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
+import 'package:mnemonicorum/services/achievement_system.dart';
 import 'package:mnemonicorum/widgets/progress_dashboard.dart';
+import 'package:mnemonicorum/utils/latex_renderer_utils.dart';
+import 'package:mnemonicorum/utils/error_handler.dart';
+import 'package:mnemonicorum/models/category.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    // Preload commonly used categories for better performance
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadCommonCategories();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Optimize memory usage when app goes to background
+    if (state == AppLifecycleState.paused) {
+      LatexRendererUtils.optimizeMemoryUsage();
+    }
+  }
+
+  Future<void> _preloadCommonCategories() async {
+    await ErrorHandler.handleRepositoryError(
+      () async {
+        final formulaRepository = Provider.of<FormulaRepository>(
+          context,
+          listen: false,
+        );
+        final categories = formulaRepository.getAllCategories();
+
+        // Preload the first 2 categories for better performance
+        if (categories.isNotEmpty) {
+          final categoryIds = categories.take(2).map((c) => c.id).toList();
+          await formulaRepository.preloadCategories(categoryIds);
+        }
+      },
+      'preload common categories',
+      context: context,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return ErrorHandler.errorBoundary(
+      child: _buildHomeContent(context),
+      errorMessage: 'Failed to load home screen. Please restart the app.',
+    );
+  }
+
+  Widget _buildHomeContent(BuildContext context) {
     final formulaRepository = Provider.of<FormulaRepository>(context);
+    final achievementSystem = Provider.of<AchievementSystem>(context);
     final categories = formulaRepository.getAllCategories();
 
     return Scaffold(
@@ -44,13 +108,18 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.local_fire_department, color: Colors.red),
-                        SizedBox(width: 10),
+                        const Icon(
+                          Icons.local_fire_department,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(width: 10),
                         Text(
-                          '你已经连续练习了 5 天！保持下去！', // Placeholder
-                          style: TextStyle(fontSize: 16),
+                          achievementSystem.currentStreak > 0
+                              ? '你已经连续练习了 ${achievementSystem.currentStreak} 天！保持下去！'
+                              : '开始你的练习连击吧！',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
@@ -101,38 +170,15 @@ class HomeScreen extends StatelessWidget {
                           childAspectRatio: 1.2,
                         ),
                     itemCount: categories.length,
+                    cacheExtent:
+                        200, // Cache items for better scrolling performance
                     itemBuilder: (context, index) {
                       final category = categories[index];
-                      return GestureDetector(
+                      return _OptimizedCategoryCard(
+                        category: category,
                         onTap: () {
                           context.go('/category/${category.id}');
                         },
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Placeholder for category icon
-                              Icon(
-                                Icons.category,
-                                size: 50,
-                                color: Colors.blue.shade700,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                category.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
                       );
                     },
                   ),
@@ -140,6 +186,48 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Optimized category card widget with better performance
+class _OptimizedCategoryCard extends StatelessWidget {
+  final FormulaCategory category;
+  final VoidCallback onTap;
+
+  const _OptimizedCategoryCard({required this.category, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      // RepaintBoundary prevents unnecessary repaints
+      child: GestureDetector(
+        onTap: onTap,
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Optimized icon rendering
+              Icon(Icons.category, size: 50, color: Colors.blue.shade700),
+              const SizedBox(height: 10),
+              Text(
+                category.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

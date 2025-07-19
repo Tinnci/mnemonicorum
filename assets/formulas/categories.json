@@ -12,7 +12,7 @@
             {
               "id": "e_to_x_taylor",
               "name": "e的x次幂的泰勒级数",
-              "latexExpression": "e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}",
+              "latexExpression": "e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}",
               "category": "calculus",
               "subcategory": "series",
               "difficulty": "medium",
@@ -27,7 +27,7 @@
                 },
                 {
                   "id": "e_x_rhs",
-                  "latexPart": "\sum_{n=0}^{\infty} \frac{x^n}{n!}",
+                  "latexPart": "\\sum_{n=0}^{\\infty} \\frac{x^n}{n!}",
                   "type": "rightSide",
                   "description": "求和从n=0到无穷大，x的n次幂除以n的阶乘"
                 }
@@ -44,7 +44,7 @@
             {
               "id": "integration_by_parts",
               "name": "分部积分法",
-              "latexExpression": "\int u \, dv = uv - \int v \, du",
+              "latexExpression": "\\int u \\, dv = uv - \\int v \\, du",
               "category": "calculus",
               "subcategory": "integration",
               "difficulty": "medium",
@@ -53,13 +53,13 @@
               "components": [
                 {
                   "id": "ibp_lhs",
-                  "latexPart": "\int u \, dv",
+                  "latexPart": "\\int u \\, dv",
                   "type": "leftSide",
                   "description": "u对dv的积分"
                 },
                 {
                   "id": "ibp_rhs",
-                  "latexPart": "uv - \int v \, du",
+                  "latexPart": "uv - \\int v \\, du",
                   "type": "rightSide",
                   "description": "uv减去v对du的积分"
                 }
@@ -83,7 +83,7 @@
             {
               "id": "pythagorean_identity",
               "name": "勾股定理恒等式",
-              "latexExpression": "\sin^2 x + \cos^2 x = 1",
+              "latexExpression": "\\sin^2 x + \\cos^2 x = 1",
               "category": "trigonometry",
               "subcategory": "identities",
               "difficulty": "easy",
@@ -92,7 +92,7 @@
               "components": [
                 {
                   "id": "pi_lhs",
-                  "latexPart": "\sin^2 x + \cos^2 x",
+                  "latexPart": "\\sin^2 x + \\cos^2 x",
                   "type": "leftSide",
                   "description": "sin平方x加cos平方x"
                 },
@@ -115,7 +115,7 @@
             {
               "id": "sin_a_plus_b",
               "name": "sin(a+b)",
-              "latexExpression": "\sin(a + b) = \sin a \cos b + \cos a \sin b",
+              "latexExpression": "\\sin(a + b) = \\sin a \\cos b + \\cos a \\sin b",
               "category": "trigonometry",
               "subcategory": "addition",
               "difficulty": "medium",
@@ -124,13 +124,13 @@
               "components": [
                 {
                   "id": "sab_lhs",
-                  "latexPart": "\sin(a + b)",
+                  "latexPart": "\\sin(a + b)",
                   "type": "leftSide",
                   "description": "sin(a加b)"
                 },
                 {
                   "id": "sab_rhs",
-                  "latexPart": "\sin a \cos b + \cos a \sin b",
+                  "latexPart": "\\sin a \\cos b + \\cos a \\sin b",
                   "type": "rightSide",
                   "description": "sin a cos b加cos a sin b"
                 }

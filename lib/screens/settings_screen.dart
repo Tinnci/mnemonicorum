@@ -56,6 +56,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('重置所有进度'),
             trailing: const Icon(Icons.delete_forever, color: Colors.red),
             onTap: () async {
+              // Capture ScaffoldMessenger before any async operations
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+
               // Show confirmation dialog
               final confirm = await showDialog<bool>(
                 context: context,
@@ -83,12 +86,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               if (confirm == true) {
                 await progressService.clearAllProgress();
-                if (!mounted) return; // This line is already there
-                // Ensure context is valid before showing SnackBar
                 if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('所有进度已重置。')));
+                  // Show success message
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(content: Text('所有进度已重置。')),
+                  );
                 }
               }
             },

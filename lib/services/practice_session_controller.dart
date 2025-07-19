@@ -3,10 +3,12 @@ import 'package:mnemonicorum/models/exercise.dart';
 import 'package:mnemonicorum/models/formula.dart';
 import 'package:mnemonicorum/services/exercise_generator.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
+import 'package:mnemonicorum/services/achievement_system.dart';
 
 class PracticeSessionController extends ChangeNotifier {
   final ExerciseGenerator _exerciseGenerator;
   final ProgressService _progressService;
+  final AchievementSystem? _achievementSystem;
 
   List<Formula> _formulas = [];
   int _currentExerciseIndex = 0;
@@ -19,8 +21,10 @@ class PracticeSessionController extends ChangeNotifier {
   PracticeSessionController({
     required ExerciseGenerator exerciseGenerator,
     required ProgressService progressService,
+    AchievementSystem? achievementSystem,
   }) : _exerciseGenerator = exerciseGenerator,
-       _progressService = progressService;
+       _progressService = progressService,
+       _achievementSystem = achievementSystem;
 
   List<Formula> get formulas => _formulas;
   int get currentExerciseIndex => _currentExerciseIndex;
@@ -82,6 +86,20 @@ class PracticeSessionController extends ChangeNotifier {
     _selectedOptionId = null;
     _showFeedback = false;
     notifyListeners();
+  }
+
+  Future<void> completeSession() async {
+    if (_achievementSystem != null) {
+      final allProgress = _progressService.getAllFormulaProgress();
+      final sessionAccuracy = totalQuestions == 0
+          ? 0
+          : ((_correctAnswers / totalQuestions) * 100).round();
+
+      await _achievementSystem.checkForNewAchievements(
+        allProgress: allProgress,
+        sessionAccuracy: sessionAccuracy,
+      );
+    }
   }
 
   void resetSession() {
