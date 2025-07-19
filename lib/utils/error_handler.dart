@@ -274,18 +274,82 @@ class ErrorHandler {
     }
   }
 
-  /// Handle exercise generation errors
+  /// Handle exercise generation errors with fallback strategies
   static T? handleExerciseError<T>(
     T Function() operation,
     String operationName, {
     T? fallbackValue,
+    List<T Function()>? fallbackStrategies,
   }) {
     try {
       return operation();
     } catch (error, stackTrace) {
       logError(operationName, error, stackTrace: stackTrace);
+
+      // Try fallback strategies in order
+      if (fallbackStrategies != null) {
+        for (final strategy in fallbackStrategies) {
+          try {
+            final result = strategy();
+            debugPrint(
+              '$_logTag: $operationName succeeded with fallback strategy',
+            );
+            return result;
+          } catch (fallbackError) {
+            logError('$operationName fallback', fallbackError);
+          }
+        }
+      }
+
       return fallbackValue;
     }
+  }
+
+  /// Validate LaTeX expression before rendering
+  static bool isValidLatexExpression(String latex) {
+    try {
+      // Basic validation checks
+      if (latex.isEmpty) return false;
+
+      // Check for balanced braces
+      int braceCount = 0;
+      for (int i = 0; i < latex.length; i++) {
+        if (latex[i] == '{') braceCount++;
+        if (latex[i] == '}') braceCount--;
+        if (braceCount < 0) return false;
+      }
+
+      if (braceCount != 0) return false;
+
+      // Check for common malformed patterns
+      final invalidPatterns = [
+        r'\\inf[^t]', // \inf not followed by 't'
+        r'\\fr[^a]', // \fr not followed by 'a'
+        r'\\su[^m]', // \su not followed by 'm'
+        r'\\in[^t]', // \in not followed by 't'
+        r'\\lim[^i]', // \lim not followed by 'i'
+      ];
+
+      for (final pattern in invalidPatterns) {
+        if (RegExp(pattern).hasMatch(latex)) {
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      logError('LaTeX validation', error);
+      return false;
+    }
+  }
+
+  /// Create fallback exercise when generation fails
+  static dynamic createFallbackExercise(String formulaId, String formulaName) {
+    debugPrint('$_logTag: Creating fallback exercise for formula $formulaId');
+
+    // This would return a simple recognition exercise as fallback
+    // Implementation depends on your Exercise model structure
+    return null; // Placeholder - implement based on your needs
   }
 
   /// Handle progress tracking errors
