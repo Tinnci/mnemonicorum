@@ -141,7 +141,7 @@ class _FormulaListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                  width: 240,
+                  width: 200,
                   height: 60, // 固定高度
                   child: FittedBox(
                     // 关键：向内 scaleDown
