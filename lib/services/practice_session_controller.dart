@@ -53,6 +53,22 @@ class PracticeSessionController extends ChangeNotifier {
 
   List<Exercise> _generateExercises(List<Formula> formulas) {
     final generated = <Exercise>[];
+
+    // 首先添加一个多对多匹配练习
+    final multiMatchingExercise = ErrorHandler.handleExerciseError(
+      () => _exerciseGenerator.generateMultiMatchingExercise(
+        allFormulas: formulas,
+      ),
+      'Generate multi-matching exercise',
+      fallbackStrategies: [
+        () => _exerciseGenerator.generateRecognitionExercise(
+          formulas.first,
+          formulas,
+        ),
+      ],
+    );
+    if (multiMatchingExercise != null) generated.add(multiMatchingExercise);
+
     for (var formula in formulas) {
       // Use error handling for each exercise generation with fallback strategies
       final matchingExercise = ErrorHandler.handleExerciseError(
@@ -95,6 +111,21 @@ class PracticeSessionController extends ChangeNotifier {
 
   void selectOption(String optionId) {
     if (_showFeedback) return; // Prevent re-selection when feedback is shown
+
+    // 特殊处理多对多匹配练习
+    if (currentExercise!.type == ExerciseType.multiMatching) {
+      if (optionId == 'completed') {
+        // 多对多匹配完成
+        _correctAnswers++;
+        _showFeedback = true;
+        _progressService.recordExerciseAttempt(
+          currentExercise!.formula.id,
+          true, // 多对多匹配完成算作正确
+        );
+        notifyListeners();
+      }
+      return;
+    }
 
     _selectedOptionId = optionId;
     _showFeedback = true;

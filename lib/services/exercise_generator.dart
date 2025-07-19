@@ -22,6 +22,7 @@ class ExerciseGenerator {
       latexExpression: formula.latexExpression,
       textLabel: formula.name,
       isCorrect: true,
+      pairId: '', // 识别练习不需要pairId
     );
 
     // Generate distractors from same category: randomly select 3 other formula names
@@ -46,6 +47,7 @@ class ExerciseGenerator {
             latexExpression: '',
             textLabel: randomFormula.name,
             isCorrect: false,
+            pairId: '', // 识别练习不需要pairId
           ),
         );
       }
@@ -69,6 +71,7 @@ class ExerciseGenerator {
             latexExpression: '',
             textLabel: randomFormula.name,
             isCorrect: false,
+            pairId: '', // 识别练习不需要pairId
           ),
         );
       }
@@ -99,6 +102,7 @@ class ExerciseGenerator {
             latexExpression: '',
             textLabel: genericName,
             isCorrect: false,
+            pairId: '', // 识别练习不需要pairId
           ),
         );
       }
@@ -156,6 +160,7 @@ class ExerciseGenerator {
       latexExpression: correctAnswerComponent.latexPart,
       textLabel: correctAnswerComponent.description,
       isCorrect: true,
+      pairId: '', // 匹配练习不需要pairId
     );
 
     // Generate 3 structurally similar but mathematically incorrect distractors
@@ -206,6 +211,7 @@ class ExerciseGenerator {
       latexExpression: blankedComponent.latexPart,
       textLabel: blankedComponent.description,
       isCorrect: true,
+      pairId: '', // 填空练习不需要pairId
     );
 
     // Generate distractors from same formula's other components or similar components from same formula set
@@ -226,6 +232,57 @@ class ExerciseGenerator {
       options: options,
       correctAnswerId: blankedComponent.id,
       explanation: '这是 ${formula.name} 中缺失的部分。',
+    );
+  }
+
+  /// Generate a multi-matching exercise where user matches multiple formula names with their expressions
+  Exercise generateMultiMatchingExercise({
+    required List<Formula> allFormulas,
+    int pairCount = 4, // 决定生成几对匹配项
+  }) {
+    // 选择指定数量的公式
+    final selectedFormulas = (allFormulas..shuffle()).take(pairCount).toList();
+    final List<ExerciseOption> options = [];
+    int pairIdCounter = 0;
+
+    for (var formula in selectedFormulas) {
+      final pairId = 'pair_$pairIdCounter';
+
+      // 创建公式名称卡片
+      options.add(
+        ExerciseOption(
+          id: '${formula.id}_name',
+          textLabel: formula.name,
+          latexExpression: '', // 名称卡片没有表达式
+          isCorrect: false,
+          pairId: pairId,
+        ),
+      );
+
+      // 创建公式表达式卡片
+      options.add(
+        ExerciseOption(
+          id: '${formula.id}_expr',
+          textLabel: '', // 表达式卡片没有文字标签
+          latexExpression: formula.latexExpression,
+          isCorrect: false,
+          pairId: pairId,
+        ),
+      );
+
+      pairIdCounter++;
+    }
+
+    options.shuffle(_random); // 打乱所有卡片的顺序
+
+    return Exercise(
+      id: 'multi_matching_${DateTime.now().millisecondsSinceEpoch}',
+      formula: selectedFormulas.first, // 随便选一个作为代表
+      type: ExerciseType.multiMatching, // 使用新题型
+      question: '请将左侧的名称与右侧的公式匹配', // 题目说明
+      options: options, // 所有待匹配的卡片
+      correctAnswerId: '', // 在这种模式下不需要
+      explanation: '将名称和它们对应的数学表达式连接起来。',
     );
   }
 
@@ -264,6 +321,7 @@ class ExerciseGenerator {
             latexExpression: component.latexPart,
             textLabel: component.description,
             isCorrect: false,
+            pairId: '', // 匹配练习不需要pairId
           ),
         );
       }
@@ -280,6 +338,7 @@ class ExerciseGenerator {
             latexExpression: swappedLatex,
             textLabel: '变换后的表达式',
             isCorrect: false,
+            pairId: '', // 匹配练习不需要pairId
           ),
         );
       } else {
@@ -293,6 +352,7 @@ class ExerciseGenerator {
               latexExpression: modifiedLatex,
               textLabel: '修改后的表达式',
               isCorrect: false,
+              pairId: '', // 匹配练习不需要pairId
             ),
           );
         } else {
@@ -325,6 +385,7 @@ class ExerciseGenerator {
                 latexExpression: genericLatexExpr,
                 textLabel: '通用表达式',
                 isCorrect: false,
+                pairId: '', // 匹配练习不需要pairId
               ),
             );
           } else {
@@ -373,6 +434,7 @@ class ExerciseGenerator {
             latexExpression: component.latexPart,
             textLabel: component.description,
             isCorrect: false,
+            pairId: '', // 填空练习不需要pairId
           ),
         );
       }
@@ -397,6 +459,7 @@ class ExerciseGenerator {
             latexExpression: component.latexPart,
             textLabel: component.description,
             isCorrect: false,
+            pairId: '', // 填空练习不需要pairId
           ),
         );
       }
@@ -415,6 +478,7 @@ class ExerciseGenerator {
             latexExpression: modifiedLatex,
             textLabel: '修改后的表达式',
             isCorrect: false,
+            pairId: '', // 填空练习不需要pairId
           ),
         );
       } else {
@@ -453,6 +517,7 @@ class ExerciseGenerator {
               latexExpression: genericLatexExpr,
               textLabel: '通用表达式',
               isCorrect: false,
+              pairId: '', // 填空练习不需要pairId
             ),
           );
         } else {
@@ -635,6 +700,8 @@ class ExerciseGenerator {
           return _validateMatchingExercise(exercise);
         case ExerciseType.completion:
           return _validateCompletionExercise(exercise);
+        case ExerciseType.multiMatching:
+          return _validateMultiMatchingExercise(exercise);
       }
     } catch (error) {
       ErrorHandler.logError('Exercise validation', error);
@@ -710,6 +777,42 @@ class ExerciseGenerator {
           !ErrorHandler.isValidLatexExpression(option.latexExpression)) {
         ErrorHandler.logError(
           'Completion validation',
+          'Invalid option LaTeX: ${option.latexExpression}',
+        );
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /// Validate multi-matching exercise specific requirements
+  bool _validateMultiMatchingExercise(Exercise exercise) {
+    // 多对多匹配练习应该有偶数个选项
+    if (exercise.options.length % 2 != 0) {
+      ErrorHandler.logError(
+        'MultiMatching validation',
+        'Must have even number of options, found ${exercise.options.length}',
+      );
+      return false;
+    }
+
+    // 检查是否有足够的配对
+    final pairIds = exercise.options.map((opt) => opt.pairId).toSet();
+    if (pairIds.length != exercise.options.length / 2) {
+      ErrorHandler.logError(
+        'MultiMatching validation',
+        'Incorrect number of pairs',
+      );
+      return false;
+    }
+
+    // 验证有LaTeX表达式的选项
+    for (final option in exercise.options) {
+      if (option.latexExpression.isNotEmpty &&
+          !ErrorHandler.isValidLatexExpression(option.latexExpression)) {
+        ErrorHandler.logError(
+          'MultiMatching validation',
           'Invalid option LaTeX: ${option.latexExpression}',
         );
         return false;

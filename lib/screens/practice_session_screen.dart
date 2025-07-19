@@ -10,6 +10,7 @@ import 'package:mnemonicorum/services/achievement_system.dart';
 import 'package:mnemonicorum/widgets/completion_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/matching_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/recognition_exercise_widget.dart';
+import 'package:mnemonicorum/widgets/multi_matching_exercise_widget.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
 
 class PracticeSessionScreen extends StatefulWidget {
@@ -241,6 +242,15 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                       break;
                     case ExerciseType.recognition:
                       exerciseWidget = RecognitionExerciseWidget(
+                        exercise: currentExercise,
+                        onOptionSelected: controller.selectOption,
+                        showFeedback: controller.showFeedback,
+                        selectedOptionId: controller.selectedOptionId,
+                        correctAnswerId: currentExercise.correctAnswerId,
+                      );
+                      break;
+                    case ExerciseType.multiMatching:
+                      exerciseWidget = MultiMatchingExerciseWidget(
                         exercise: currentExercise,
                         onOptionSelected: controller.selectOption,
                         showFeedback: controller.showFeedback,

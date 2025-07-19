@@ -11,6 +11,8 @@ enum ExerciseType {
   completion,
   @HiveField(2)
   recognition,
+  @HiveField(3)
+  multiMatching, // 多对多配对
 }
 
 @HiveType(typeId: 10)
@@ -23,12 +25,15 @@ class ExerciseOption {
   final String textLabel;
   @HiveField(3)
   final bool isCorrect;
+  @HiveField(4)
+  final String pairId; // 用于标识配对关系
 
   ExerciseOption({
     required this.id,
     required this.latexExpression,
     required this.textLabel,
     required this.isCorrect,
+    required this.pairId,
   });
 }
 

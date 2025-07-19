@@ -21,13 +21,14 @@ class ExerciseOptionAdapter extends TypeAdapter<ExerciseOption> {
       latexExpression: fields[1] as String,
       textLabel: fields[2] as String,
       isCorrect: fields[3] as bool,
+      pairId: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ExerciseOption obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class ExerciseOptionAdapter extends TypeAdapter<ExerciseOption> {
       ..writeByte(2)
       ..write(obj.textLabel)
       ..writeByte(3)
-      ..write(obj.isCorrect);
+      ..write(obj.isCorrect)
+      ..writeByte(4)
+      ..write(obj.pairId);
   }
 
   @override
@@ -114,6 +117,8 @@ class ExerciseTypeAdapter extends TypeAdapter<ExerciseType> {
         return ExerciseType.completion;
       case 2:
         return ExerciseType.recognition;
+      case 3:
+        return ExerciseType.multiMatching;
       default:
         return ExerciseType.matching;
     }
@@ -130,6 +135,9 @@ class ExerciseTypeAdapter extends TypeAdapter<ExerciseType> {
         break;
       case ExerciseType.recognition:
         writer.writeByte(2);
+        break;
+      case ExerciseType.multiMatching:
+        writer.writeByte(3);
         break;
     }
   }

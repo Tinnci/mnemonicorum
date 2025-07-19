@@ -64,13 +64,14 @@ class FormulaCategoryAdapter extends TypeAdapter<FormulaCategory> {
       name: fields[1] as String,
       description: fields[2] as String,
       formulaSets: (fields[3] as List).cast<FormulaSet>(),
+      icon: fields[4] as IconData,
     );
   }
 
   @override
   void write(BinaryWriter writer, FormulaCategory obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -78,7 +79,9 @@ class FormulaCategoryAdapter extends TypeAdapter<FormulaCategory> {
       ..writeByte(2)
       ..write(obj.description)
       ..writeByte(3)
-      ..write(obj.formulaSets);
+      ..write(obj.formulaSets)
+      ..writeByte(4)
+      ..write(obj.icon);
   }
 
   @override
