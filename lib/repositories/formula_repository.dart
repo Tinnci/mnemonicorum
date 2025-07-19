@@ -135,8 +135,7 @@ class FormulaRepository {
     return null;
   }
 
-  Future<List<Formula>> searchFormulas(String query) async {
-    final lowerCaseQuery = query.toLowerCase();
+  Future<List<Formula>> getAllFormulas() async {
     List<Formula> allFormulas = [];
 
     // Load all categories lazily for search
@@ -151,6 +150,20 @@ class FormulaRepository {
         );
       }
     }
+    return allFormulas;
+  }
+
+  List<Formula> getAllFormulasNow() {
+    List<Formula> allFormulas = [];
+    for (var formulas in _formulaCache.values) {
+      allFormulas.addAll(formulas);
+    }
+    return allFormulas;
+  }
+
+  Future<List<Formula>> searchFormulas(String query) async {
+    final lowerCaseQuery = query.toLowerCase();
+    final allFormulas = await getAllFormulas(); // Use the new method
 
     return allFormulas
         .where(

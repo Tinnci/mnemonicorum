@@ -6,14 +6,12 @@ import 'package:mnemonicorum/widgets/formula_renderer.dart';
 class OptimizedFormulaList extends StatefulWidget {
   final List<Formula> formulas;
   final Function(Formula) onFormulaTap;
-  final double itemHeight;
   final bool enableLazyLoading;
 
   const OptimizedFormulaList({
     super.key,
     required this.formulas,
     required this.onFormulaTap,
-    this.itemHeight = 80.0,
     this.enableLazyLoading = true,
   });
 
@@ -66,10 +64,14 @@ class _OptimizedFormulaListState extends State<OptimizedFormulaList>
   void _cleanupDistantCacheItems() {
     if (_itemCache.length <= _cacheSize) return;
 
-    final currentIndex = (_scrollController.offset / widget.itemHeight).round();
+    // Since we no longer have fixed item height, use a simpler cleanup strategy
+    final keysToRemove = <int>[];
+    final currentIndex = _scrollController.hasClients
+        ? (_scrollController.offset / 100)
+              .round() // Approximate item height
+        : 0;
     final visibleRange = 10; // Keep items within 10 positions of current view
 
-    final keysToRemove = <int>[];
     for (var key in _itemCache.keys) {
       if ((key - currentIndex).abs() > visibleRange) {
         keysToRemove.add(key);
@@ -91,7 +93,6 @@ class _OptimizedFormulaListState extends State<OptimizedFormulaList>
     final item = _FormulaListItem(
       formula: formula,
       onTap: () => widget.onFormulaTap(formula),
-      height: widget.itemHeight,
     );
 
     // Cache the item if we haven't exceeded cache size
@@ -109,8 +110,7 @@ class _OptimizedFormulaListState extends State<OptimizedFormulaList>
     return ListView.builder(
       controller: _scrollController,
       itemCount: widget.formulas.length,
-      itemExtent: widget.itemHeight, // Fixed height for better performance
-      cacheExtent: widget.itemHeight * 10, // Cache 10 items ahead/behind
+      padding: const EdgeInsets.only(bottom: 80), // Add padding for FAB etc.
       physics: const BouncingScrollPhysics(), // Smooth scrolling physics
       itemBuilder: _buildOptimizedItem,
     );
@@ -121,87 +121,74 @@ class _OptimizedFormulaListState extends State<OptimizedFormulaList>
 class _FormulaListItem extends StatelessWidget {
   final Formula formula;
   final VoidCallback onTap;
-  final double height;
 
-  const _FormulaListItem({
-    required this.formula,
-    required this.onTap,
-    required this.height,
-  });
+  const _FormulaListItem({required this.formula, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                // Formula preview with constrained size for performance
-                SizedBox(
-                  width: 80,
-                  height: 40,
-                  child: FormulaRenderer(
-                    latexExpression: formula.latexExpression,
-                    fontSize: 14,
-                    semanticDescription: formula.description,
-                    useCache: true, // Always use cache for list items
-                  ),
+    // No longer needs a fixed-height SizedBox
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
+            children: [
+              SizedBox(
+                width: 120,
+                child: FormulaRenderer(
+                  latexExpression: formula.latexExpression,
+                  fontSize: 16,
+                  semanticDescription: formula.description,
+                  useCache: true,
                 ),
-                const SizedBox(width: 12),
-                // Formula details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        formula.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      formula.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        formula.description,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                // Category indicator
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withAlpha(26),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    formula.category,
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formula.description,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              // Category indicator
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withAlpha(26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  formula.category,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

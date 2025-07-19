@@ -8,6 +8,7 @@ import 'package:mnemonicorum/screens/category_screen.dart';
 import 'package:mnemonicorum/screens/practice_session_screen.dart';
 import 'package:mnemonicorum/screens/results_screen.dart';
 import 'package:mnemonicorum/screens/settings_screen.dart';
+import 'package:mnemonicorum/screens/all_formulas_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -21,6 +22,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/progress',
       builder: (context, state) => const ProgressScreen(),
+    ),
+    GoRoute(
+      path: '/all-formulas',
+      builder: (context, state) => const AllFormulasScreen(),
     ),
     GoRoute(
       path: '/category/:categoryId',

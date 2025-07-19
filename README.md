@@ -9,6 +9,7 @@ A modern, interactive Flutter application designed to help students master mathe
 - **Real-time Feedback**: Immediate visual feedback on correct/incorrect answers
 - **Adaptive Difficulty**: Progressive learning based on performance
 - **Formula Rendering**: Beautiful LaTeX formula display with mathematical notation
+- **Formula Overview**: Comprehensive search and filter system for all formulas
 
 ### Comprehensive Progress Tracking
 - **Detailed Statistics**: Track accuracy, completion rates, and learning streaks
@@ -26,6 +27,8 @@ A modern, interactive Flutter application designed to help students master mathe
 - **Calculus Formulas**: Taylor series, integration techniques, infinitesimal equivalents
 - **Trigonometry**: Trigonometric identities and formulas
 - **Extensible System**: Easy to add new formula categories and sets
+- **Advanced Search**: Search formulas by name, description, or tags
+- **Category Filtering**: Filter by mathematical categories and subcategories
 
 ## 🛠️ Technology Stack
 
@@ -98,6 +101,7 @@ flutter build ios
 2. **Select a category** from the home screen (e.g., Calculus, Trigonometry)
 3. **Choose a formula set** within the category
 4. **Start practicing** with interactive exercises
+5. **Use the formula overview** to search and filter all available formulas
 
 ### Exercise Types
 
@@ -121,6 +125,13 @@ flutter build ios
 - **Accuracy Metrics**: Track performance across different formula types
 - **Achievement Unlocks**: Earn badges for consistent practice and improvement
 - **Category Progress**: Monitor completion rates for each mathematical topic
+
+### Formula Overview & Search
+- **Comprehensive Search**: Search across all formulas by name, description, or tags
+- **Category Filtering**: Filter formulas by mathematical categories (Calculus, Trigonometry, etc.)
+- **Subcategory Filtering**: Further refine results by subcategories (Taylor Series, Integration, etc.)
+- **Modern UI**: Material 3 design with responsive layout that adapts to any screen size
+- **Real-time Filtering**: Instant results as you type or change filters
 
 ## 🏗️ Architecture
 

@@ -133,6 +133,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       textStyle: const TextStyle(fontSize: 18),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.go('/all-formulas');
+                    },
+                    icon: const Icon(Icons.search),
+                    label: const Text('所有公式查询'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ],
               ),
             ),
