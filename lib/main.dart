@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
@@ -8,6 +10,7 @@ import 'package:mnemonicorum/app_router.dart';
 import 'package:mnemonicorum/hive_initializer.dart';
 import 'package:mnemonicorum/utils/latex_renderer_utils.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
+import 'package:mnemonicorum/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +30,9 @@ void main() async {
 }
 
 Future<void> _initializeApp() async {
+  // Initialize Firebase with platform-specific options
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   // Preload mathematics fonts to avoid rendering delays
   await ErrorHandler.handleDataLoadingError(
     () => LatexRendererUtils.preloadMathematicsFonts(),
@@ -68,15 +74,21 @@ Future<void> _initializeApp() async {
   _setupPeriodicMemoryOptimization();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ProgressService>(create: (_) => progressService),
-        Provider<FormulaRepository>(create: (_) => formulaRepository),
-        ChangeNotifierProvider<AchievementSystem>(
-          create: (_) => achievementSystem,
-        ),
-      ],
-      child: const MainApp(),
+    ProviderScope(
+      child: provider.MultiProvider(
+        providers: [
+          provider.ChangeNotifierProvider<ProgressService>(
+            create: (_) => progressService,
+          ),
+          provider.Provider<FormulaRepository>(
+            create: (_) => formulaRepository,
+          ),
+          provider.ChangeNotifierProvider<AchievementSystem>(
+            create: (_) => achievementSystem,
+          ),
+        ],
+        child: const MainApp(),
+      ),
     ),
   );
 }
@@ -98,7 +110,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(routerConfig: appRouter);
+    return MaterialApp.router(
+      routerConfig: appRouter,
+      title: 'Mnemonicorum',
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+    );
   }
 }
 

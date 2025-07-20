@@ -43,3 +43,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase and sensitive configuration files
+firebase.json
+lib/firebase_options.dart
+lib/firebase_options.dart.backup
+
+# Generated files that may contain sensitive data
+*.g.dart
+!lib/models/*.g.dart
+!lib/services/*.g.dart
+
+# Environment and API keys
+.env
+.env.local
+.env.production
+api_keys.dart
+secrets.dart

@@ -12,6 +12,8 @@ import 'package:mnemonicorum/widgets/matching_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/recognition_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/multi_matching_exercise_widget.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
+import 'package:mnemonicorum/models/category.dart';
+import 'package:mnemonicorum/models/formula.dart';
 
 class PracticeSessionScreen extends StatefulWidget {
   final String formulaSetId;
@@ -63,16 +65,76 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
       );
 
       // Load formulas for the given formula set with error handling
-      final formulaSet = formulaRepository
-          .getAllCategories()
-          .expand((category) => category.formulaSets)
-          .firstWhere(
-            (set) => set.id == widget.formulaSetId,
-            orElse: () => throw ExerciseGenerationException(
-              'Formula set ${widget.formulaSetId} not found',
-              widget.formulaSetId,
-            ),
+      FormulaSet? formulaSet;
+
+      // Check if this is a quick practice session (dynamic ID)
+      if (widget.formulaSetId.startsWith('quick_practice_')) {
+        // For quick practice, get formulas that need practice
+        final progressService = Provider.of<ProgressService>(
+          context,
+          listen: false,
+        );
+
+        final formulaIdsNeedingPractice = progressService
+            .getFormulasNeedingPractice();
+
+        if (formulaIdsNeedingPractice.isEmpty) {
+          throw ExerciseGenerationException(
+            'No formulas need practice at this time',
+            widget.formulaSetId,
           );
+        }
+
+        // Get actual Formula objects from the repository
+        final formulasNeedingPractice = <Formula>[];
+        for (final formulaId in formulaIdsNeedingPractice) {
+          final formula = formulaRepository.getFormulaById(formulaId);
+          if (formula != null) {
+            formulasNeedingPractice.add(formula);
+          }
+        }
+
+        if (formulasNeedingPractice.isEmpty) {
+          throw ExerciseGenerationException(
+            'No valid formulas found for practice',
+            widget.formulaSetId,
+          );
+        }
+
+        // Create a dynamic formula set for quick practice
+        formulaSet = FormulaSet(
+          id: widget.formulaSetId,
+          name: 'Quick Practice',
+          difficulty: DifficultyLevel.medium,
+          formulas: formulasNeedingPractice,
+        );
+      } else {
+        // For regular formula sets, find in static data
+        try {
+          formulaSet = formulaRepository
+              .getAllCategories()
+              .expand((category) => category.formulaSets)
+              .firstWhere(
+                (set) => set.id == widget.formulaSetId,
+                orElse: () => throw ExerciseGenerationException(
+                  'Formula set ${widget.formulaSetId} not found',
+                  widget.formulaSetId,
+                ),
+              );
+        } catch (e) {
+          // Log available formula sets for debugging
+          final availableSets = formulaRepository
+              .getAllCategories()
+              .expand((category) => category.formulaSets)
+              .map((set) => set.id)
+              .toList();
+
+          debugPrint('Available formula sets: $availableSets');
+          debugPrint('Requested formula set: ${widget.formulaSetId}');
+
+          rethrow;
+        }
+      }
 
       if (formulaSet.formulas.isEmpty) {
         throw ExerciseGenerationException(

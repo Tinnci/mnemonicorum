@@ -11,13 +11,9 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
-        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }  // 阿里云 Gradle 插件镜像
-        maven { url = uri("https://maven.aliyun.com/repository/public") }         // 阿里云公共镜像
-        maven { url = uri("https://maven.aliyun.com/repository/google") }         // 阿里云 Google 镜像
-        maven { url = uri("https://mirrors.tencent.com/gradle-plugin") }         // 腾讯云镜像
-        gradlePluginPortal()                                                     // 官方 Gradle 插件门户（必要，确保最新版本）
-        google()                                                                 // Google 官方仓库
-        mavenCentral()                                                           // Maven 中央仓库
+        google()
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
