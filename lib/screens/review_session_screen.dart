@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mnemonicorum/models/exercise.dart';
+import 'package:mnemonicorum/models/formula.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
 import 'package:mnemonicorum/services/exercise_generator.dart';
 import 'package:mnemonicorum/services/practice_session_controller.dart';
@@ -12,19 +13,24 @@ import 'package:mnemonicorum/widgets/matching_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/recognition_exercise_widget.dart';
 import 'package:mnemonicorum/widgets/multi_matching_exercise_widget.dart';
 import 'package:mnemonicorum/utils/error_handler.dart';
-import 'package:mnemonicorum/models/category.dart';
-import 'package:mnemonicorum/models/formula.dart';
 
-class PracticeSessionScreen extends StatefulWidget {
-  final String formulaSetId;
+enum ReviewMode { incorrectAnswers, spacedRepetition, recentlyIncorrect }
 
-  const PracticeSessionScreen({super.key, required this.formulaSetId});
+class ReviewSessionScreen extends StatefulWidget {
+  final ReviewMode reviewMode;
+  final int limit;
+
+  const ReviewSessionScreen({
+    super.key,
+    required this.reviewMode,
+    this.limit = 10,
+  });
 
   @override
-  State<PracticeSessionScreen> createState() => _PracticeSessionScreenState();
+  State<ReviewSessionScreen> createState() => _ReviewSessionScreenState();
 }
 
-class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
+class _ReviewSessionScreenState extends State<ReviewSessionScreen> {
   late PracticeSessionController _sessionController;
   bool _isLoading = true;
   String? _errorMessage;
@@ -64,137 +70,50 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
         achievementSystem: achievementSystem,
       );
 
-      // Set session metadata
-      _sessionController.setSessionMetadata(sessionType: 'practice');
+      // Get formula IDs based on review mode
+      List<String> formulaIds;
+      String sessionName;
 
-      // Check for existing session to resume
-      final savedSessions = await _sessionController.getRecentSessions(
-        limit: 1,
-      );
-      if (savedSessions.isNotEmpty &&
-          savedSessions.first.formulaIds.isNotEmpty &&
-          savedSessions.first.sessionType == 'practice') {
-        // Ask user if they want to resume the previous session
-        if (mounted) {
-          final shouldResume = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('恢复上次练习'),
-              content: const Text('是否要恢复上次未完成的练习会话？'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('开始新练习'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('恢复上次练习'),
-                ),
-              ],
-            ),
+      switch (widget.reviewMode) {
+        case ReviewMode.incorrectAnswers:
+          formulaIds = progressService.getFormulasWithIncorrectAnswers(
+            limit: widget.limit,
           );
+          sessionName = '错题回顾';
+          break;
+        case ReviewMode.spacedRepetition:
+          formulaIds = progressService.getFormulasForSpacedRepetition(
+            limit: widget.limit,
+          );
+          sessionName = '间隔复习';
+          break;
+        case ReviewMode.recentlyIncorrect:
+          formulaIds = progressService.getRecentlyIncorrectFormulas(
+            limit: widget.limit,
+          );
+          sessionName = '最近错题';
+          break;
+      }
 
-          if (shouldResume == true) {
-            final success = await _sessionController.loadSession(
-              savedSessions.first.sessionId,
-            );
-            if (success) {
-              if (mounted) {
-                setState(() {
-                  _isLoading = false;
-                });
-              }
-              return;
-            }
-            // If loading fails, continue with new session
-          }
+      if (formulaIds.isEmpty) {
+        throw Exception('没有需要复习的公式。请先完成一些练习！');
+      }
+
+      // Get actual Formula objects from the repository
+      final formulasToReview = <Formula>[];
+      for (final formulaId in formulaIds) {
+        final formula = formulaRepository.getFormulaById(formulaId);
+        if (formula != null) {
+          formulasToReview.add(formula);
         }
       }
 
-      // Load formulas for the given formula set with error handling
-      FormulaSet? formulaSet;
-
-      // Check if this is a quick practice session (dynamic ID)
-      if (widget.formulaSetId.startsWith('quick_practice_')) {
-        // For quick practice, get formulas that need practice
-        final progressService = Provider.of<ProgressService>(
-          context,
-          listen: false,
-        );
-
-        final formulaIdsNeedingPractice = progressService
-            .getFormulasNeedingPractice();
-
-        if (formulaIdsNeedingPractice.isEmpty) {
-          throw ExerciseGenerationException(
-            'No formulas need practice at this time',
-            widget.formulaSetId,
-          );
-        }
-
-        // Get actual Formula objects from the repository
-        final formulasNeedingPractice = <Formula>[];
-        for (final formulaId in formulaIdsNeedingPractice) {
-          final formula = formulaRepository.getFormulaById(formulaId);
-          if (formula != null) {
-            formulasNeedingPractice.add(formula);
-          }
-        }
-
-        if (formulasNeedingPractice.isEmpty) {
-          throw ExerciseGenerationException(
-            'No valid formulas found for practice',
-            widget.formulaSetId,
-          );
-        }
-
-        // Create a dynamic formula set for quick practice
-        formulaSet = FormulaSet(
-          id: widget.formulaSetId,
-          name: 'Quick Practice',
-          difficulty: DifficultyLevel.medium,
-          formulas: formulasNeedingPractice,
-        );
-      } else {
-        // For regular formula sets, find in static data
-        try {
-          formulaSet = formulaRepository
-              .getAllCategories()
-              .expand((category) => category.formulaSets)
-              .firstWhere(
-                (set) => set.id == widget.formulaSetId,
-                orElse: () => throw ExerciseGenerationException(
-                  'Formula set ${widget.formulaSetId} not found',
-                  widget.formulaSetId,
-                ),
-              );
-        } catch (e) {
-          // Log available formula sets for debugging
-          final availableSets = formulaRepository
-              .getAllCategories()
-              .expand((category) => category.formulaSets)
-              .map((set) => set.id)
-              .toList();
-
-          debugPrint('Available formula sets: $availableSets');
-          debugPrint('Requested formula set: ${widget.formulaSetId}');
-
-          rethrow;
-        }
-      }
-
-      if (formulaSet.formulas.isEmpty) {
-        throw ExerciseGenerationException(
-          'No formulas found in formula set ${widget.formulaSetId}',
-          widget.formulaSetId,
-        );
+      if (formulasToReview.isEmpty) {
+        throw Exception('无法加载复习公式。请稍后再试！');
       }
 
       if (!mounted) return;
-      _sessionController.initializeSession(formulaSet.formulas);
-
-      // Save initial session state
-      await _sessionController.saveSession();
+      _sessionController.initializeSession(formulasToReview);
 
       if (mounted) {
         setState(() {
@@ -203,7 +122,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
       }
     } catch (error, stackTrace) {
       ErrorHandler.logError(
-        'Initialize practice session',
+        'Initialize review session',
         error,
         stackTrace: stackTrace,
       );
@@ -212,8 +131,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
         setState(() {
           _isLoading = false;
           _hasError = true;
-          _errorMessage =
-              'Failed to initialize practice session. Please try again.';
+          _errorMessage = error.toString();
         });
       }
     }
@@ -229,6 +147,17 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
     super.dispose();
   }
 
+  String _getReviewModeTitle() {
+    switch (widget.reviewMode) {
+      case ReviewMode.incorrectAnswers:
+        return '错题回顾';
+      case ReviewMode.spacedRepetition:
+        return '间隔复习';
+      case ReviewMode.recentlyIncorrect:
+        return '最近错题';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ErrorHandler.errorBoundary(
@@ -237,14 +166,14 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
           : _hasError
           ? Scaffold(
               appBar: AppBar(
-                title: const Text('练习会话'),
+                title: Text(_getReviewModeTitle()),
                 leading: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
                     if (context.canPop()) {
                       context.pop();
                     } else {
-                      context.go('/home'); // 修改：从'/'改为'/home'
+                      context.go('/home');
                     }
                   },
                 ),
@@ -262,7 +191,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        '会话初始化失败',
+                        '复习会话初始化失败',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 8),
@@ -282,7 +211,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                           if (context.canPop()) {
                             context.pop();
                           } else {
-                            context.go('/home'); // 修改：从'/'改为'/home'
+                            context.go('/home');
                           }
                         },
                         child: const Text('返回主页'),
@@ -300,7 +229,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                   final currentQuestionNumber =
                       controller.currentExerciseIndex + 1;
 
-                  // 1. 首先检查会话是否已经完成
+                  // Check if session is completed
                   if (controller.isSessionCompleted) {
                     // Complete session and check for achievements, then navigate to results screen
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -311,7 +240,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
 
                       final success = await ErrorHandler.handleProgressError(
                         () => controller.completeSession(),
-                        'complete practice session',
+                        'complete review session',
                         context: currentContext,
                       );
 
@@ -320,7 +249,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                         // Check if the context is still valid
                         if (currentContext.mounted) {
                           GoRouter.of(currentContext).go(
-                            '/results?correct=${controller.correctAnswers}&total=$totalQuestions&formulaSetId=${widget.formulaSetId}',
+                            '/results?correct=${controller.correctAnswers}&total=$totalQuestions&reviewMode=${widget.reviewMode.index}',
                           );
                         }
                       }
@@ -328,7 +257,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                     return const Scaffold(body: Center(child: Text('会话完成！')));
                   }
 
-                  // 2. 在确认会话未完成后，再安全地获取当前练习
+                  // Get current exercise
                   final currentExercise = controller.currentExercise;
 
                   if (currentExercise == null) {
@@ -380,17 +309,15 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                   return Scaffold(
                     appBar: AppBar(
                       title: Text(
-                        '练习会话 ($currentQuestionNumber/$totalQuestions)',
+                        '${_getReviewModeTitle()} ($currentQuestionNumber/$totalQuestions)',
                       ),
                       leading: IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
                           if (context.canPop()) {
-                            context.pop(); // Go back to previous screen
+                            context.pop();
                           } else {
-                            context.go(
-                              '/home', // 修改：从'/'改为'/home'
-                            ); // Go to home screen if nothing to pop
+                            context.go('/home');
                           }
                         },
                       ),
@@ -399,7 +326,38 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          // Formula name and category
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    currentExercise.formula.name,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${currentExercise.formula.category} > ${currentExercise.formula.subcategory}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Exercise widget
                           Expanded(child: Center(child: exerciseWidget)),
+
+                          // Next button when feedback is shown
                           if (controller.showFeedback) ...[
                             const SizedBox(height: 20),
                             ElevatedButton(
@@ -417,7 +375,7 @@ class _PracticeSessionScreenState extends State<PracticeSessionScreen> {
               ),
             ),
       errorMessage:
-          'Failed to load practice session. Please go back and try again.',
+          'Failed to load review session. Please go back and try again.',
     );
   }
 }

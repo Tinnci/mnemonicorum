@@ -44,10 +44,16 @@ final GoRouter appRouter = GoRouter(
         final correct = int.parse(state.uri.queryParameters['correct'] ?? '0');
         final total = int.parse(state.uri.queryParameters['total'] ?? '0');
         final formulaSetId = state.uri.queryParameters['formulaSetId'];
+        final reviewModeParam = state.uri.queryParameters['reviewMode'];
+        final reviewMode = reviewModeParam != null
+            ? int.parse(reviewModeParam)
+            : null;
+
         return ResultsScreen(
           correctAnswers: correct,
           totalQuestions: total,
           formulaSetId: formulaSetId,
+          reviewMode: reviewMode,
         );
       },
     ),

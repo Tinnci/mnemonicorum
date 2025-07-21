@@ -3,6 +3,7 @@ import 'package:mnemonicorum/models/category.dart';
 import 'package:mnemonicorum/models/formula.dart';
 import 'package:mnemonicorum/models/progress.dart';
 import 'package:mnemonicorum/models/achievement.dart';
+import 'package:mnemonicorum/models/session_state.dart';
 
 void registerHiveAdapters() {
   Hive.registerAdapter(MasteryLevelAdapter());
@@ -17,4 +18,5 @@ void registerHiveAdapters() {
   Hive.registerAdapter(AchievementTypeAdapter());
   Hive.registerAdapter(AchievementAdapter());
   Hive.registerAdapter(UserAchievementsAdapter());
+  Hive.registerAdapter(SessionStateAdapter());
 }

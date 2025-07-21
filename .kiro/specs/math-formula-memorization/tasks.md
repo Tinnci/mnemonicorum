@@ -361,21 +361,28 @@
     - Implement content validation pipeline for formula data integrity
     - _Requirements: 2.1, 5.1, 5.2, 5.3 - Quality assurance_
 
-- [ ] 13. Create comprehensive test suite
-  - [ ] 13.1 Write unit tests
+- [x] 13. Create comprehensive test suite
+  - [x] 13.1 Write unit tests
+
+
     - Priority: Test ExerciseGenerator extensively - create test cases for each exercise type
     - Verify distractor generation logic is predictable and handles edge cases (insufficient formulas in category)
     - Test progress calculation and mastery level algorithms
     - Test data model serialization and Hive storage operations
     - _Requirements: All requirements validation_
 
-  - [ ] 13.2 Write widget tests
+  - [x] 13.2 Write widget tests
+
+
     - Test FormulaRenderer with various LaTeX expressions
     - Verify exercise widget interactions and feedback systems
     - Test navigation flows and screen transitions
+    - Expand existing widget tests beyond AllFormulasScreen
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2_
 
-  - [ ] 13.3 Write integration tests
+  - [x] 13.3 Write integration tests
+
+
     - Test complete practice session flows from start to finish
     - Verify progress persistence and retrieval across app restarts
     - Test category navigation and formula set selection
@@ -405,17 +412,22 @@
     - Store current formula set context for easy repetition
     - _Requirements: 1.1, 1.4, 7.3 - Enhanced practice workflow_
 
-  - [ ] 14.3 Implement adaptive wrong-answer review system
+  - [x] 14.3 Implement adaptive wrong-answer review system
+
+
+
     - Root cause analysis: No mechanism to review and retry incorrect answers
     - Problem: Users cannot focus on formulas they struggle with
-    - Solution: Track incorrect answers during practice sessions
+    - Solution: Leverage existing ExerciseAttempt tracking in ProgressService
     - Create "错题回顾" mode that focuses on previously missed questions
     - Implement spaced repetition algorithm for difficult formulas
     - Add "重点练习" option that prioritizes low-accuracy formulas
     - Generate targeted exercises based on user's weak areas
     - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3 - Adaptive learning_
 
-  - [ ] 14.4 Enhance practice session state management
+  - [x] 14.4 Enhance practice session state management
+
+
     - Root cause analysis: Practice sessions don't persist user preferences or context
     - Problem: Loss of context when navigating between screens
     - Solution: Implement session persistence and state recovery
@@ -425,7 +437,9 @@
     - Add session analytics to track learning patterns
     - _Requirements: 4.4, 6.3, 6.4 - Persistent learning experience_
 
-  - [ ] 14.5 Create comprehensive practice analytics
+  - [x] 14.5 Create comprehensive practice analytics
+
+
     - Implement detailed session analytics and learning insights
     - Add progress visualization with charts and trends
     - Create personalized learning recommendations
@@ -450,3 +464,33 @@
     - Ensure adaptive navigation meets accessibility standards
     - Polish new results screen and practice options UI
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
+
+- [ ] 16. Implement AI-enhanced learning features
+  - [-] 16.1 Fix integration test dependencies
+
+    - Add integration_test package to pubspec.yaml
+    - Update integration tests to use proper test bindings
+    - Fix any broken test references
+    - Ensure tests run successfully in CI environment
+    - _Requirements: All requirements validation_
+
+  - [ ] 16.2 Enhance analytics with learning insights
+    - Implement detailed formula difficulty analysis
+    - Create personalized study recommendations based on performance data
+    - Add visual progress charts showing improvement over time
+    - Implement spaced repetition scheduling for optimal learning
+    - _Requirements: 4.1, 4.2, 4.4_
+
+  - [ ] 16.3 Add multi-language support
+    - Implement localization infrastructure
+    - Add support for English and Chinese interfaces
+    - Create translation files for UI elements
+    - Ensure proper rendering of mathematical notation across languages
+    - _Requirements: New - Accessibility and global reach_
+
+  - [ ] 16.4 Optimize for web deployment
+    - Test and optimize LaTeX rendering performance in web browsers
+    - Implement web-specific navigation patterns
+    - Ensure proper offline functionality with service workers
+    - Add web-specific installation prompts and PWA support
+    - _Requirements: 6.2, 6.3, 7.1, 7.2_

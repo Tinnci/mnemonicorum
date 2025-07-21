@@ -6,12 +6,14 @@ class ResultsScreen extends StatelessWidget {
   final int correctAnswers;
   final int totalQuestions;
   final String? formulaSetId;
+  final int? reviewMode;
 
   const ResultsScreen({
     super.key,
     required this.correctAnswers,
     required this.totalQuestions,
     this.formulaSetId,
+    this.reviewMode,
   });
 
   @override

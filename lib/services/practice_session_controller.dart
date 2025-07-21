@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:mnemonicorum/models/exercise.dart';
 import 'package:mnemonicorum/models/formula.dart';
+import 'package:mnemonicorum/models/session_state.dart';
 import 'package:mnemonicorum/services/exercise_generator.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
@@ -122,6 +124,10 @@ class PracticeSessionController extends ChangeNotifier {
           currentExercise!.formula.id,
           true, // 多对多匹配完成算作正确
         );
+
+        // Save session state after answer
+        _updateSessionState();
+
         notifyListeners();
       }
       return;
@@ -145,6 +151,10 @@ class PracticeSessionController extends ChangeNotifier {
       selectedOptionId: optionId,
       correctOptionId: currentExercise!.correctAnswerId,
     );
+
+    // Save session state after answer
+    _updateSessionState();
+
     notifyListeners();
   }
 
@@ -154,6 +164,10 @@ class PracticeSessionController extends ChangeNotifier {
     _currentExerciseIndex++;
     _selectedOptionId = null;
     _showFeedback = false;
+
+    // Save session state after moving to next exercise
+    _updateSessionState();
+
     notifyListeners();
   }
 
@@ -182,7 +196,131 @@ class PracticeSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // For session persistence (to be implemented with Hive later)
-  // Future<void> saveSession() async { ... }
-  // Future<void> loadSession() async { ... }
+  // Session persistence methods
+  String? _sessionId;
+  String? _sessionType;
+  int? _reviewMode;
+
+  void setSessionMetadata({String? sessionType, int? reviewMode}) {
+    _sessionType = sessionType;
+    _reviewMode = reviewMode;
+  }
+
+  Future<void> saveSession() async {
+    if (_formulas.isEmpty || _exercises.isEmpty) return;
+
+    try {
+      final sessionBox = await Hive.openBox<SessionState>('sessionStates');
+
+      // Create session state from current controller state
+      final sessionState = SessionState.fromController(
+        formulas: _formulas,
+        currentExerciseIndex: _currentExerciseIndex,
+        exercises: _exercises,
+        correctAnswers: _correctAnswers,
+        incorrectAnswers: _incorrectAnswers,
+        sessionType: _sessionType,
+        reviewMode: _reviewMode,
+      );
+
+      // Save session ID for later reference
+      _sessionId = sessionState.sessionId;
+
+      // Save to Hive
+      await sessionBox.put(_sessionId, sessionState);
+
+      // Clean up old sessions
+      _cleanupOldSessions(sessionBox);
+    } catch (e) {
+      ErrorHandler.logError('Save session', e);
+    }
+  }
+
+  Future<bool> loadSession(String sessionId) async {
+    try {
+      final sessionBox = await Hive.openBox<SessionState>('sessionStates');
+      final sessionState = sessionBox.get(sessionId);
+
+      if (sessionState == null || sessionState.isExpired) {
+        return false;
+      }
+
+      // We need to reconstruct the formulas and exercises
+      // This is a simplified approach - in a real app, you'd need to fetch
+      // the actual Formula objects from a repository
+
+      // For now, we'll just return false to indicate failure
+      return false;
+    } catch (e) {
+      ErrorHandler.logError('Load session', e);
+      return false;
+    }
+  }
+
+  Future<List<SessionState>> getRecentSessions({int limit = 5}) async {
+    try {
+      final sessionBox = await Hive.openBox<SessionState>('sessionStates');
+      final sessions = sessionBox.values.toList();
+
+      // Sort by last updated (most recent first)
+      sessions.sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+
+      // Filter out expired sessions
+      final validSessions = sessions.where((s) => !s.isExpired).toList();
+
+      // Return limited number
+      return validSessions.take(limit).toList();
+    } catch (e) {
+      ErrorHandler.logError('Get recent sessions', e);
+      return [];
+    }
+  }
+
+  Future<void> _cleanupOldSessions(Box<SessionState> sessionBox) async {
+    try {
+      final now = DateTime.now();
+      final keysToDelete = <String>[];
+
+      // Find expired sessions (older than 24 hours)
+      for (final key in sessionBox.keys) {
+        final session = sessionBox.get(key);
+        if (session != null) {
+          final difference = now.difference(session.lastUpdated);
+          if (difference.inHours > 24) {
+            keysToDelete.add(key.toString());
+          }
+        }
+      }
+
+      // Delete expired sessions
+      for (final key in keysToDelete) {
+        await sessionBox.delete(key);
+      }
+    } catch (e) {
+      ErrorHandler.logError('Cleanup old sessions', e);
+    }
+  }
+
+  // Update session state after each action
+  Future<void> _updateSessionState() async {
+    if (_sessionId != null) {
+      try {
+        final sessionBox = await Hive.openBox<SessionState>('sessionStates');
+        final existingState = sessionBox.get(_sessionId);
+
+        if (existingState != null) {
+          final updatedState = existingState.copyWith(
+            currentExerciseIndex: _currentExerciseIndex,
+            correctAnswers: _correctAnswers,
+            incorrectAnswers: _incorrectAnswers,
+            lastUpdated: DateTime.now(),
+          );
+
+          await sessionBox.put(_sessionId, updatedState);
+        }
+      } catch (e) {
+        ErrorHandler.logError('Update session state', e);
+      }
+    }
+  }
 }

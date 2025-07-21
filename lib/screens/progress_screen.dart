@@ -5,6 +5,7 @@ import 'package:mnemonicorum/widgets/progress_dashboard.dart';
 import 'package:mnemonicorum/services/progress_service.dart';
 import 'package:mnemonicorum/services/achievement_system.dart';
 import 'package:mnemonicorum/repositories/formula_repository.dart';
+import 'package:mnemonicorum/screens/review_session_screen.dart';
 
 /// Screen displaying comprehensive progress tracking and achievements
 class ProgressScreen extends StatelessWidget {
@@ -243,6 +244,139 @@ class _ProgressContent extends StatelessWidget {
               ),
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          // Adaptive Review Options
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Focused Review',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 16),
+                  Consumer<ProgressService>(
+                    builder: (context, progressService, child) {
+                      // Check if there are any formulas with incorrect answers
+                      final hasIncorrectAnswers = progressService
+                          .getFormulasWithIncorrectAnswers(limit: 1)
+                          .isNotEmpty;
+
+                      // Check if there are any formulas for spaced repetition
+                      final hasSpacedRepetition = progressService
+                          .getFormulasForSpacedRepetition(limit: 1)
+                          .isNotEmpty;
+
+                      // Check if there are any recently incorrect formulas
+                      final hasRecentlyIncorrect = progressService
+                          .getRecentlyIncorrectFormulas(limit: 1)
+                          .isNotEmpty;
+
+                      if (!hasIncorrectAnswers &&
+                          !hasSpacedRepetition &&
+                          !hasRecentlyIncorrect) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.school_outlined,
+                                  size: 64,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  '没有复习数据',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '完成一些练习后，这里将显示针对性的复习选项',
+                                  style: TextStyle(color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: [
+                          if (hasIncorrectAnswers)
+                            _buildReviewOption(
+                              context,
+                              '错题回顾',
+                              '针对你经常答错的公式进行重点练习',
+                              Icons.error_outline,
+                              Colors.red.shade700,
+                              () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ReviewSessionScreen(
+                                        reviewMode: ReviewMode.incorrectAnswers,
+                                      ),
+                                ),
+                              ),
+                            ),
+
+                          if (hasIncorrectAnswers &&
+                              (hasSpacedRepetition || hasRecentlyIncorrect))
+                            const SizedBox(height: 12),
+
+                          if (hasSpacedRepetition)
+                            _buildReviewOption(
+                              context,
+                              '间隔复习',
+                              '基于记忆曲线优化的复习计划',
+                              Icons.schedule,
+                              Colors.blue.shade700,
+                              () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ReviewSessionScreen(
+                                        reviewMode: ReviewMode.spacedRepetition,
+                                      ),
+                                ),
+                              ),
+                            ),
+
+                          if (hasSpacedRepetition && hasRecentlyIncorrect)
+                            const SizedBox(height: 12),
+
+                          if (hasRecentlyIncorrect)
+                            _buildReviewOption(
+                              context,
+                              '最近错题',
+                              '复习你最近一周内答错的公式',
+                              Icons.history,
+                              Colors.orange.shade700,
+                              () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ReviewSessionScreen(
+                                        reviewMode:
+                                            ReviewMode.recentlyIncorrect,
+                                      ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -269,6 +403,62 @@ class _ProgressContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildReviewOption(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: color.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(12),
+          color: color.withOpacity(0.05),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: color, size: 16),
+          ],
+        ),
+      ),
     );
   }
 }
